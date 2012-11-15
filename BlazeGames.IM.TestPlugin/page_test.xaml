@@ -1,0 +1,11 @@
+﻿<UserControl x:Class="BlazeGames.IM.TestPlugin.page_test"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="492" d:DesignWidth="780" Width="780" Height="492">
+    <Grid>
+        <Label Content="Loaded from a plugin" Height="28" HorizontalAlignment="Center" Margin="0" Name="label1" VerticalAlignment="Center" />
+    </Grid>
+</UserControl>

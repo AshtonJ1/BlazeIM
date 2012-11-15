@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="BlazeGames.IM.Client.page_chat" x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+             d:DesignHeight="492" d:DesignWidth="780">
+    <Grid>
+
+        <RichTextBox x:Name="rtf_output" HorizontalAlignment="Left" Height="391" Margin="10,10,0,0" VerticalAlignment="Top" Width="760" Background="#BFFFFFFF" BorderBrush="#BFFFFFFF" BorderThickness="5" TextChanged="rtf_output_TextChanged" IsReadOnly="True" IsDocumentEnabled="True" FontFamily="Segoe WP" MouseEnter="rtf_output_MouseEnter" MouseLeave="rtf_output_MouseLeave" />
+        <RichTextBox x:Name="rtf_input" HorizontalAlignment="Left" Height="76" Margin="10,406,0,0" VerticalAlignment="Top" Width="760" Background="#BFFFFFFF" BorderBrush="#BFFFFFFF" FontFamily="Segoe WP" />
+        
+        <Border BorderBrush="#FF00AE20" BorderThickness="0,10,0,0" Height="80" HorizontalAlignment="Right" Margin="25" Name="profile_image" VerticalAlignment="Top" Width="70" MouseEnter="profile_image_MouseEnter" MouseLeave="profile_image_MouseLeave">
+            <Border.Background>
+                <ImageBrush ImageSource="https://blaze-games.com/api/image/nocompress/?nickname=" x:Name="profile_image_source" />
+            </Border.Background>
+            <Border.ToolTip>
+                <ToolTip>
+                    <StackPanel>
+                        <TextBlock FontWeight="Bold" Text="" Name="txt_chattingwith_nickname" />
+                        <TextBlock Text="" Name="txt_chattingwith_statusupdate" />
+                    </StackPanel>
+                </ToolTip>
+            </Border.ToolTip>
+        </Border>
+    </Grid>
+</UserControl>

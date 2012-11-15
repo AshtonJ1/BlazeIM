@@ -1,0 +1,173 @@
+﻿<Window x:ClassModifier="internal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:local="clr-namespace:BlazeGames.IM.Client" xmlns:Custom="http://metro.mahapps.com/winfx/xaml/controls" x:Name="wnd" x:Class="BlazeGames.IM.Client.MainWindow"
+        Title="Blaze IM" Height="575" Width="850" FontFamily="./resources/#Segoe WP" MouseDown="wnd_MouseDown" BorderThickness="0" BorderBrush="#FF27282C" Icon="BG_Icon.ico" ResizeMode="CanMinimize" WindowStyle="None" StateChanged="wnd_StateChanged" Loaded="wnd_Loaded" GotFocus="wnd_GotFocus" MouseEnter="wnd_MouseEnter" MouseLeave="wnd_MouseLeave" Closing="wnd_Closing" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary>
+                    <SolidColorBrush x:Key="AccentColor" Color="#FF119EDA" />
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+            <ControlTemplate x:Key="NavLink"  TargetType="{x:Type Button}">
+                <Label x:Name="btn_close" Content="{TemplateBinding Content}" Foreground="#FFE0E0E0" FontSize="14" FontFamily="Segoe WP" Cursor="Hand" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"/>
+            </ControlTemplate>
+            <ControlTemplate x:Key="ProfileSettings"  TargetType="{x:Type Button}">
+                <Rectangle>
+                    <Rectangle.Fill>
+                        <VisualBrush Visual="{DynamicResource appbar_settings}" />
+                    </Rectangle.Fill>
+                </Rectangle>
+            </ControlTemplate>
+            <ControlTemplate x:Key="AddFriend"  TargetType="{x:Type Button}">
+                <Rectangle>
+                    <Rectangle.Fill>
+                        <VisualBrush Visual="{DynamicResource appbar_user_add}" />
+                    </Rectangle.Fill>
+                </Rectangle>
+            </ControlTemplate>
+            <Canvas Width="48" Height="48" Clip="F1 M 0,0L 48,0L 48,48L 0,48L 0,0" UseLayoutRounding="False" x:Key="appbar_user_add">
+                <Path Width="24" Height="25" Canvas.Left="12" Canvas.Top="12" Stretch="Fill" Fill="#FFDADADA" Data="F1 M 17,24L 20,24L 20,29L 25,29L 25,32L 20,32L 20,37L 17,37L 17,32L 12,32L 12,29L 17,29L 17,24 Z M 24,12C 27.5,12 29,14 28.4952,18.1979C 28.9462,18.4566 29.25,18.9428 29.25,19.5C 29.25,20.1818 28.7951,20.7574 28.1723,20.9397C 27.9121,21.8672 27.508,22.6882 27,23.3449L 27,26.5C 28.6667,26.8333 30,27 32,28C 34,29 34.6667,29.9167 36,31.25L 36,36L 21,36L 21,33L 26,33L 26,28L 21,28L 21,23.3449L 21,23L 20.7528,23C 20.3602,22.4091 20.0442,21.7113 19.8277,20.9397C 19.2049,20.7574 18.75,20.1818 18.75,19.5C 18.75,18.9428 19.0538,18.4566 19.5048,18.1979C 19,14 20.5,12 24,12 Z M 12,36L 12,33L 16,33L 16,36L 12,36 Z " />
+            </Canvas>
+            <Canvas Width="48" Height="48" Clip="F1 M 0,0L 48,0L 48,48L 0,48L 0,0" UseLayoutRounding="False" x:Key="appbar_settings">
+                <Path Width="19.6504" Height="19.6504" Canvas.Left="14.1748" Canvas.Top="14.1748" Stretch="Fill" Fill="#FFDADADA" Data="F1 M 24.69,17.5542L 27.9094,14.793C 28.5138,15.05 29.0876,15.3647 29.6241,15.7302L 29.0458,19.93L 33.2747,20.2541C 33.5166,20.8524 33.7023,21.4794 33.8252,22.1286L 30.4458,24.69L 33.207,27.9094C 32.95,28.5137 32.6353,29.0876 32.2698,29.6241L 28.07,29.0458L 27.7459,33.2747C 27.1476,33.5166 26.5206,33.7023 25.8714,33.8252L 23.3099,30.4458L 20.0906,33.207C 19.4862,32.95 18.9124,32.6353 18.3759,32.2698L 18.9542,28.0699L 14.7253,27.7459C 14.4834,27.1476 14.2977,26.5206 14.1748,25.8713L 17.5542,23.3099L 14.793,20.0906C 15.05,19.4862 15.3647,18.9124 15.7302,18.3759L 19.93,18.9542L 20.2541,14.7252C 20.8524,14.4834 21.4794,14.2977 22.1286,14.1748L 24.69,17.5542 Z M 24,20C 21.7909,20 20,21.7909 20,24C 20,26.2091 21.7909,28 24,28C 26.2091,28 28,26.2091 28,24C 28,21.7909 26.2091,20 24,20 Z " />
+            </Canvas>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Window.Background>
+        <ImageBrush ImageSource="pack://application:,,,/Resources/BGIM_BG.png"/>
+    </Window.Background>
+    
+    <Grid Name="grid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="73"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="70"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Rectangle Name="bar"  Fill="{DynamicResource AccentColor}" Height="3" VerticalAlignment="Top" Margin="0,71,0,0" Grid.ColumnSpan="2" Grid.Row="1" Loaded="bar_Loaded" />
+        <Border x:Name="profile_image" BorderBrush="#FF00AE20" BorderThickness="0,10,0,0" HorizontalAlignment="Left" Height="80" VerticalAlignment="Top" Width="70" Grid.RowSpan="2">
+            <Border.Background>
+                <ImageBrush x:Name="profile_image_source" ImageSource="https://blaze-games.com/api/image/nocompress/?nickname="/>
+            </Border.Background>
+            <Border.ContextMenu>
+                <ContextMenu>
+                    <ContextMenu.ItemsSource>
+                        <CompositeCollection>
+                            <MenuItem Header="Status">
+                                <MenuItem Header="Online" IsChecked="True" Click="setstatus_online_Click" />
+                                <MenuItem Header="Away" Click="setstatus_away_Click" />
+                                <MenuItem Header="Busy" Click="setstatus_busy_Click" />
+                                <MenuItem Header="Offline" Click="setstatus_offline_Click" />
+                            </MenuItem>
+                            <Separator />
+                            <MenuItem Header="Change Profile Image" Click="btn_changeprofileimg_Click" />
+                            <Separator />
+                            <MenuItem Name="btn_maximum1"  Header="Maximum" Click="MenuItem_Click_2" />
+                            <Separator />
+                            <MenuItem Header="Quit" Click="MenuItem_Click_1" />
+                        </CompositeCollection>
+                    </ContextMenu.ItemsSource>
+                </ContextMenu>
+            </Border.ContextMenu>
+        </Border>
+        <TextBlock x:Name="txt_nickname" Grid.Column="1" HorizontalAlignment="Left" Margin="10,4,0,0" TextWrapping="Wrap" Text="Ashton Storks" VerticalAlignment="Top" Grid.Row="1" Foreground="{DynamicResource AccentColor}" FontSize="22" Width="360" FontFamily="./resources/#Segoe WP" />
+        <TextBox x:Name="txt_status" Background="{x:Null}" BorderBrush="{x:Null}" Grid.Column="1" HorizontalAlignment="Left" Margin="10,33,0,0" TextWrapping="Wrap" Text="This is a status update" VerticalAlignment="Top" Grid.Row="1" Foreground="#FFDADADA" FontSize="16" Width="360" FontFamily="./resources/#Segoe WP" KeyUp="txt_status_KeyUp" LostKeyboardFocus="txt_status_LostKeyboardFocus" />
+
+        <!-- Navigation Strip -->
+        <Rectangle x:Name="nav_bar" Fill="{DynamicResource AccentColor}" Height="1" VerticalAlignment="Top" Margin="0,22,0,0" Grid.Row="1" HorizontalAlignment="Right" Width="350" Grid.Column="1"/>
+        <Button IsTabStop="False" x:Name="btn_close" FontFamily="./resources/#Segoe WP" Content="hide" Margin="740,5,0,0" Width="37" Height="27" Grid.Column="1" Grid.RowSpan="2" Template="{DynamicResource NavLink}" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="{DynamicResource AccentColor}" BorderThickness="0" Padding="0" Click="btn_close_Click"/>
+        <Button IsTabStop="False" x:Name="btn_minimize" FontFamily="./resources/#Segoe WP" Content="minimum" Margin="665,5,0,0" Width="69" Height="27" Grid.Column="1" Grid.RowSpan="2" Template="{DynamicResource NavLink}" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="{DynamicResource AccentColor}" BorderThickness="0" Padding="0" Click="btn_minimize_Click"/>
+        <Button IsTabStop="False" x:Name="btn_settings" FontFamily="./resources/#Segoe WP" Content="settings" Margin="597,5,0,0" Width="58" Height="27" Grid.Column="1" Grid.RowSpan="2" Template="{DynamicResource NavLink}" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="{DynamicResource AccentColor}" BorderThickness="0" Padding="0" Click="btn_settings_Click"/>
+        <Button IsTabStop="False" x:Name="btn_chat" FontFamily="./resources/#Segoe WP" Content="chat" Margin="556,5,0,0" Width="36" Height="27" Grid.Column="1" Grid.RowSpan="2" Template="{DynamicResource NavLink}" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="{DynamicResource AccentColor}" BorderThickness="0" Padding="0" Click="btn_chat_Click"/>
+        <Button IsTabStop="False" x:Name="btn_contacts" FontFamily="./resources/#Segoe WP" Content="contacts" Margin="489,5,0,0" Width="62" Height="27" Grid.Column="1" Grid.RowSpan="2" Template="{DynamicResource NavLink}" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="{DynamicResource AccentColor}" BorderThickness="0" Padding="0" Click="btn_contacts_Click"/>
+        <Button IsTabStop="False" x:Name="btn_home" FontFamily="./resources/#Segoe WP" Content="home" Margin="438,5,0,0" Width="46" Height="27" Grid.Column="1" Grid.RowSpan="2" Template="{DynamicResource NavLink}" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="{DynamicResource AccentColor}" Padding="0" BorderThickness="0,0,0,2" Click="btn_home_Click"/>
+
+
+        <!--Label x:Name="btn_settings" Content="settings" Grid.Column="1" HorizontalAlignment="Left" Margin="597,3,0,0" VerticalAlignment="Top" Foreground="#FFE0E0E0" FontSize="14" FontFamily="Segoe WP" Grid.RowSpan="2" Cursor="Hand" MouseDown="btn_settings_MouseDown"  BorderBrush="{DynamicResource AccentColor}" />
+        <Label x:Name="btn_chat" Content="chat" Grid.Column="1" HorizontalAlignment="Left" Margin="556,3,0,0" VerticalAlignment="Top" Foreground="#FFE0E0E0" FontSize="14" FontFamily="Segoe WP" Grid.RowSpan="2" Cursor="Hand" MouseDown="btn_chat_MouseDown"  BorderBrush="{DynamicResource AccentColor}" />
+        <Label x:Name="btn_contacts" Content="contacts" Grid.Column="1" HorizontalAlignment="Left" Margin="489,3,0,0" VerticalAlignment="Top" Foreground="#FFE0E0E0" FontSize="14" FontFamily="Segoe WP" Grid.RowSpan="2" Cursor="Hand" MouseDown="btn_contacts_MouseDown"  BorderBrush="{DynamicResource AccentColor}" />
+        <Label x:Name="btn_home" Content="home" Grid.Column="1" HorizontalAlignment="Left" Margin="438,3,0,0" VerticalAlignment="Top" Foreground="#FFE0E0E0" FontSize="14" FontFamily="Segoe WP" Grid.RowSpan="2" Cursor="Hand" BorderBrush="{DynamicResource AccentColor}" BorderThickness="0,0,0,2" MouseDown="btn_home_MouseDown" /-->
+        <local:page_home x:Name="page_Home" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Top" Height="492" Width="780" Margin="0" Visibility="Hidden"/>
+        <local:page_contacts x:Name="page_Contacts" Grid.Column="1" HorizontalAlignment="Left" Margin="0,0,0,0" Grid.Row="2" VerticalAlignment="Top" Height="492" Width="780" Visibility="Hidden"/>
+        <local:page_chat x:Name="page_Chat" Grid.Column="1" HorizontalAlignment="Left" Margin="0,0,0,0" Grid.Row="2" VerticalAlignment="Top" Height="492" Width="780" Visibility="Hidden"/>
+        <local:page_settings x:Name="page_Settings" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Top" Height="492" Width="780" Visibility="Hidden"/>
+
+        <local:page_login x:Name="page_Login" Grid.ColumnSpan="2" Grid.Row="2" VerticalAlignment="Top" Height="492" Margin="0" Padding="0"/>
+
+        <ListBox IsTabStop="False" x:Name="listbox1" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="70" Grid.Row="2" Background="{x:Null}" BorderBrush="{x:Null}" Margin="0,2,0,-2" SelectionChanged="listbox1_SelectionChanged">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical">
+                        <Border BorderBrush="{Binding BorderColor}" BorderThickness="0,5,0,0" Width="56" Height="56" HorizontalAlignment="Left" VerticalAlignment="Center">
+                            <Border.ToolTip>
+                                <ToolTip>
+                                    <StackPanel>
+                                        <TextBlock FontWeight="Bold" FontFamily="./resources/#Segoe WP" Text="{Binding NickName}"/>
+                                        <TextBlock FontFamily="./resources/#Segoe WP" Text="{Binding StatusUpdate}"/>
+                                    </StackPanel>
+                                </ToolTip>
+                            </Border.ToolTip>
+                            <Border.Background>
+                                <ImageBrush ImageSource="{Binding ProfileImage}"/>
+                            </Border.Background>
+                        </Border>
+                        <Label Content="{Binding NewMessages}" FontFamily="./resources/#Segoe WP" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White" Background="Red" Margin="41,-15,0,0" Width="15" Height="15" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                            <Label.Style>
+                                <Style TargetType="{x:Type Label}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding NewMessages}" Value="0">
+                                            <Setter Property="Visibility"  Value="Hidden" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Label.Style>
+                        </Label>
+                        <TextBlock Text="{Binding NickName}" FontFamily="./resources/#Segoe WP" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="9"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+
+        <TextBox x:Name="txt_search" FontFamily="./resources/#Segoe WP" TabIndex="0" Custom:TextboxHelper.ClearTextButton="True" Custom:TextboxHelper.Watermark="Search Contacts..." VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="173" Height="23" Margin="0,0,10,13" BorderBrush="#19FFFFFF" Background="White" Foreground="#FF636363" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="1" TextChanged="txt_search_TextChanged" GotFocus="txt_search_GotFocus">
+            <TextBox.Resources>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+            </TextBox.Resources>
+        </TextBox>
+
+        <Button IsTabStop="False" Cursor="Hand" Template="{DynamicResource AddFriend}" Name="btn_AddFriend" Grid.Column="1" Margin="560,34,0,0" Grid.Row="1" Width="25" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="btn_AddFriend_Click" />
+        <Button IsTabStop="False" Cursor="Hand" Template="{DynamicResource ProfileSettings}" Name="btn_ProfileSettings" Grid.Column="1" Margin="525,34,0,0" Grid.Row="1" Width="25" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="btn_ProfileSettings_Click">
+            <Button.ContextMenu>
+                <ContextMenu Name="ProfileSettingsMenu">
+                    <ContextMenu.ItemsSource>
+                        <CompositeCollection>
+                            <MenuItem Header="Status">
+                                <MenuItem Header="Online" IsChecked="True" Name="setstatus_online" Click="setstatus_online_Click" />
+                                <MenuItem Header="Away" Name="setstatus_away" Click="setstatus_away_Click" />
+                                <MenuItem Header="Busy" Name="setstatus_busy" Click="setstatus_busy_Click" />
+                                <MenuItem Header="Offline" Name="setstatus_offline" Click="setstatus_offline_Click" />
+                            </MenuItem>
+                            <Separator />
+                            <MenuItem Name="btn_changeprofileimg" Header="Change Profile Image" Click="btn_changeprofileimg_Click" />
+                            <Separator />
+                            <MenuItem Name="btn_maximum2" Header="Maximum" Click="MenuItem_Click_2" />
+                            <Separator />
+                            <MenuItem Header="Quit" Click="MenuItem_Click_1" />
+                        </CompositeCollection>
+                    </ContextMenu.ItemsSource>
+                </ContextMenu>
+            </Button.ContextMenu>
+        </Button>
+
+        <local:Control_AddFriend x:Name="AddFriendWindow" BorderBrush="{DynamicResource AccentColor}" Margin="448,65,0,0" Width="250" Height="80" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" Visibility="Collapsed" />
+        
+        <TextBlock x:Name="txt_debug" Visibility="Collapsed" FontFamily="./resources/#Segoe WP" HorizontalAlignment="Center" Margin="0,465,0,0" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Center" Height="17" Width="850" Foreground="White" Text="Blaze Games IM Version: PREVIEW    Startup Time: 0ms    Initalize Time: 0ms    Show Time: 0ms    Server Ping Time: 0ms" Grid.ColumnSpan="2" TextAlignment="Center"/>
+    </Grid>
+</Window>
+

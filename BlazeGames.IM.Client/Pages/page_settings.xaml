@@ -1,0 +1,87 @@
+﻿<UserControl x:Class="BlazeGames.IM.Client.page_settings" x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" Width="780" Height="492" Background="{x:Null}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
+                <ResourceDictionary>
+                    <Color x:Key="AccentColor">#FF119EDA</Color>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+        <TabControl HorizontalAlignment="Stretch" Margin="0" VerticalAlignment="Stretch">
+        <TabItem Header="Design" Margin="0" Width="100">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="55" />
+                    <RowDefinition Height="55" />
+                    <RowDefinition Height="55" />
+                    <RowDefinition Height="55" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Label Content="Design Color:" Height="28" HorizontalAlignment="Left" Margin="23,0,0,0" VerticalAlignment="Center" Foreground="White" FontSize="15" FontFamily="Segoe WP" />
+                <xctk:ColorPicker Name="color_designcolor" HorizontalAlignment="Right" Height="28" VerticalAlignment="Center" DisplayColorAndName="False" Width="104" Margin="0,0,15,0" Padding="5" SelectedColor="#FF25A0DA" ShowAdvancedButton="False" ShowStandardColors="True" BorderThickness="0" ShowAvailableColors="False" ShowDropDownButton="False" AvailableColorsHeader="Advanced Colors" />
+
+                <Label Content="Default Font Color:" Height="28" HorizontalAlignment="Left" Margin="23,0,0,0" VerticalAlignment="Center" Foreground="White" FontSize="15" FontFamily="Segoe WP" Grid.Row="1" />
+                <xctk:ColorPicker Name="color_defaultfontcolor" HorizontalAlignment="Right" Height="28" VerticalAlignment="Center" DisplayColorAndName="False" Width="104" Margin="0,0,15,0" Padding="5" SelectedColor="Black" ShowAdvancedButton="True" ShowStandardColors="False" BorderThickness="0" ShowAvailableColors="True" ShowDropDownButton="False" Grid.Row="1" SelectedColorChanged="color_defaultfontcolor_SelectedColorChanged" />
+
+                <Label Content="Default Font:" Height="28" HorizontalAlignment="Left" Margin="23,0,0,0" VerticalAlignment="Center" Foreground="White" FontSize="15" FontFamily="Segoe WP" Grid.Row="2" />
+                <ComboBox Name="FontsList" Height="28" HorizontalAlignment="Right" VerticalAlignment="Center" ItemsSource="{x:Static Fonts.SystemFontFamilies}" Margin="0,0,15,0" Width="104" IsEditable="False" Grid.Row="2" SelectionChanged="FontsList_SelectionChanged" IsEnabled="True" Loaded="FontsList_Loaded">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" FontFamily="{Binding}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <Label Name="txt_defaultfontsize" Content="Default Font Size:" Height="28" HorizontalAlignment="Left" Margin="23,0,0,0" VerticalAlignment="Center" Foreground="White" FontSize="15" FontFamily="Segoe WP" Grid.Row="3" />
+                <Slider Name="slider_defaultfontsize" Height="28" HorizontalAlignment="Left" Margin="269,0,0,0" VerticalAlignment="Center" Width="100" Minimum="8" Maximum="24" Value="0" Grid.Row="3" SmallChange="1" AutoToolTipPlacement="TopLeft" IsSnapToTickEnabled="False" />
+                
+            </Grid>
+        </TabItem>
+        <TabItem Header="Notifications" Margin="0" Width="170">
+                <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Controls:ToggleSwitch Name="chk_txtnotifications" Header="Text Notifications" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10" IsChecked="true" Padding="5" Foreground="White" Checked="chk_notifications_changed"  Unchecked="chk_notifications_changed" Background="{x:Null}" BorderBrush="{x:Null}" OverridesDefaultStyle="False" />
+                <Controls:ToggleSwitch Name="chk_loginnotification" Header="Contact Login" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,82,10,0" IsChecked="true" Padding="5" Foreground="White" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
+                <Controls:ToggleSwitch Name="chk_logoutnotification" Header="Contact Logout" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,144,10,0" IsChecked="true" Padding="5" Foreground="White" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
+                <Controls:ToggleSwitch Name="chk_newrequestnotification" Header="New Contact Request" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,208,10,0" IsChecked="true" Padding="5" Foreground="White" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" SwitchForeground="#FF7C6666" />
+                <Controls:ToggleSwitch Name="chk_newmessagenotification" Header="New Message" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,271,10,0" IsChecked="true" Padding="5" Foreground="White" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
+                <Controls:ToggleSwitch Name="chk_appnotifications" IsEnabled="False" IsChecked="False" Header="App Notifications" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,335,10,0" Padding="5" Foreground="White" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
+
+                <Controls:ToggleSwitch Name="chk_soundnotifications" Header="Sound Notifications" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Top" IsChecked="true" Grid.Column="1" Padding="5" Foreground="White" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
+                <Controls:ToggleSwitch Name="chk_newmessagesound" Header="New Message Sound" HorizontalAlignment="Stretch" IsChecked="true" Margin="10,82,10,0" Padding="5" VerticalAlignment="Top" Grid.Column="1" Foreground="White" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
+                <Controls:ToggleSwitch Name="chk_appsound" IsEnabled="False" IsChecked="False" Header="App Notification Sounds" HorizontalAlignment="Stretch" Margin="10,144,10,0" Padding="5" VerticalAlignment="Top" Grid.Column="1" Foreground="White" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
+            </Grid>
+            </TabItem>
+            <TabItem Header="Plugins" Width="103">
+            <Grid>
+                <Label Content="No Plugins Are Installed" Height="28" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="White" />
+            </Grid>
+        </TabItem>
+            <TabItem Header="Network">
+            <Grid>
+                <Label Content="Coming Soon" Height="28" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="White" />
+            </Grid>
+        </TabItem>
+        </TabControl>
+</UserControl>

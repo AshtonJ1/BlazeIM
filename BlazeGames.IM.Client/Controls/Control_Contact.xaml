@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="BlazeGames.IM.Client.Control_Contact" x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="70" Cursor="Hand" d:DesignWidth="260" MouseEnter="UserControl_MouseEnter_1" MouseLeave="UserControl_MouseLeave_1" BorderThickness="1" MouseLeftButtonUp="UserControl_MouseLeftButtonUp">
+    <UserControl.ContextMenu>
+        <ContextMenu>
+            <ContextMenu.Items>
+                <MenuItem Name="btn_acceptfriend" Header="Accept Contact Request" Click="btn_acceptfriend_Click" Visibility="Collapsed" />
+                <MenuItem Name="btn_denyfriend" Header="Deny Contact Request" Visibility="Collapsed" Click="btn_denyfriend_Click" />
+                
+                <MenuItem Name="btn_blockfriend" Header="Block {0}" Visibility="Collapsed" Click="btn_blockfriend_Click" />
+                <MenuItem Name="btn_removefriend" Header="Remove {0}" Click="btn_removefriend_Click" />
+            </ContextMenu.Items>
+        </ContextMenu>
+    </UserControl.ContextMenu>
+    <Grid>
+        <!-- Contact -->
+        <Border x:Name="profile_image" BorderBrush="#FF00AE20" BorderThickness="0,5,0,0" Width="50" Height="50" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" >
+            <Border.Background>
+                <ImageBrush x:Name="profile_image_source" ImageSource="https://blaze-games.com/api/image/nocompress/?nickname="/>
+            </Border.Background>
+        </Border>
+        <TextBlock x:Name="txt_Name" HorizontalAlignment="Left" Margin="65,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" FontFamily="./resources/#Segoe WP" Foreground="White" FontSize="18" Width="185"/>
+        <TextBlock x:Name="txt_Status" HorizontalAlignment="Left" Margin="65,32,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" FontFamily="./resources/#Segoe WP" Foreground="White" FontSize="14" Width="185"/>
+
+    
+    </Grid>
+</UserControl>
