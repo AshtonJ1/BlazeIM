@@ -448,7 +448,7 @@ namespace BlazeGames.IM.Client
             return Convert.ToInt32(ping.Send(hostNameOrAddress).RoundtripTime);
         }
 
-        private DateTime RetrieveLinkerTimestamp()
+        public DateTime RetrieveLinkerTimestamp()
         {
             string filePath = System.Reflection.Assembly.GetCallingAssembly().Location;
             const int c_PeHeaderOffset = 60;

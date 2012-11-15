@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Security.Cryptography;
 using System.Net;
+using System.Collections.Specialized;
 
 namespace BlazeGames.IM.Client.Core
 {
@@ -24,9 +25,25 @@ namespace BlazeGames.IM.Client.Core
 
         public static void SubmitBug(Exception ex)
         {
-            WebClient wc = new WebClient();
-            wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
-            wc.DownloadStringAsync(new Uri(string.Format("https://blaze-games.com/Support/?AddTicket=true&Severity=3&Subject=Blaze IM Bug: {4}&Message={0}<br /><br /><b>Stack Trace</b><br />{1}<br /><br /><b>OS Version</b><br />{5}&Type=Bug&Department=Services&Account={2}&Password={3}", ex.Message, ex.StackTrace, App.Account, App.Password, Guid.NewGuid().ToString().Substring(0, 8), Environment.OSVersion.ToString())));
+            using (var wc = new WebClient())
+            {
+                var data = new NameValueCollection();
+                data["title"] = ex.Message;
+                data["body"] = string.Format(@"User: {0}
+MD5Hash: {5}
+Build Info: {6}
+Source: {3}
+Method Name: {4}
+
+Message
+{1}
+
+Stack Trace
+{2}", App.Account, ex.Message, ex.StackTrace, ex.Source, ex.TargetSite.Name, App.Instance.MD5Hash, App.Instance.RetrieveLinkerTimestamp().ToString());
+
+                var response = Encoding.Default.GetString(wc.UploadValues("https://blaze-games.com/issues/?Act=Create", "POST", data));
+                Console.WriteLine(response);
+            }
         }
 
         static void wc_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
