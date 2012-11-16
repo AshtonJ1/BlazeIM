@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:BlazeGames.IM.Client" xmlns:Custom="http://metro.mahapps.com/winfx/xaml/controls" x:Name="wnd" x:Class="BlazeGames.IM.Client.MainWindow"
-        Title="Blaze IM" Height="575" Width="850" FontFamily="./resources/#Segoe WP" MouseDown="wnd_MouseDown" BorderThickness="0" BorderBrush="#FF27282C" Icon="BG_Icon.ico" ResizeMode="CanMinimize" WindowStyle="None" StateChanged="wnd_StateChanged" Loaded="wnd_Loaded" GotFocus="wnd_GotFocus" MouseEnter="wnd_MouseEnter" MouseLeave="wnd_MouseLeave" Closing="wnd_Closing" WindowStartupLocation="CenterScreen">
+        Title="Blaze IM" Height="575" Width="850" FontFamily="./resources/#Segoe WP" MouseDown="wnd_MouseDown" BorderThickness="0" BorderBrush="#FF27282C" Icon="BG_Icon.ico" ResizeMode="CanMinimize" WindowStyle="None" StateChanged="wnd_StateChanged" Loaded="wnd_Loaded" GotFocus="wnd_GotFocus" MouseEnter="wnd_MouseEnter" MouseLeave="wnd_MouseLeave" Closing="wnd_Closing" WindowStartupLocation="CenterScreen" MinWidth="700" MinHeight="450">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -81,24 +81,24 @@
 
         <!-- Navigation Strip -->
         <Rectangle x:Name="nav_bar" Fill="{DynamicResource AccentColor}" Height="1" VerticalAlignment="Top" Margin="0,22,0,0" Grid.Row="1" HorizontalAlignment="Right" Width="350" Grid.Column="1"/>
-        <Button IsTabStop="False" x:Name="btn_close" FontFamily="./resources/#Segoe WP" Content="hide" Margin="740,5,0,0" Width="37" Height="27" Grid.Column="1" Grid.RowSpan="2" Template="{DynamicResource NavLink}" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="{DynamicResource AccentColor}" BorderThickness="0" Padding="0" Click="btn_close_Click"/>
-        <Button IsTabStop="False" x:Name="btn_minimize" FontFamily="./resources/#Segoe WP" Content="minimum" Margin="665,5,0,0" Width="69" Height="27" Grid.Column="1" Grid.RowSpan="2" Template="{DynamicResource NavLink}" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="{DynamicResource AccentColor}" BorderThickness="0" Padding="0" Click="btn_minimize_Click"/>
-        <Button IsTabStop="False" x:Name="btn_settings" FontFamily="./resources/#Segoe WP" Content="settings" Margin="597,5,0,0" Width="58" Height="27" Grid.Column="1" Grid.RowSpan="2" Template="{DynamicResource NavLink}" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="{DynamicResource AccentColor}" BorderThickness="0" Padding="0" Click="btn_settings_Click"/>
-        <Button IsTabStop="False" x:Name="btn_chat" FontFamily="./resources/#Segoe WP" Content="chat" Margin="556,5,0,0" Width="36" Height="27" Grid.Column="1" Grid.RowSpan="2" Template="{DynamicResource NavLink}" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="{DynamicResource AccentColor}" BorderThickness="0" Padding="0" Click="btn_chat_Click"/>
-        <Button IsTabStop="False" x:Name="btn_contacts" FontFamily="./resources/#Segoe WP" Content="contacts" Margin="489,5,0,0" Width="62" Height="27" Grid.Column="1" Grid.RowSpan="2" Template="{DynamicResource NavLink}" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="{DynamicResource AccentColor}" BorderThickness="0" Padding="0" Click="btn_contacts_Click"/>
-        <Button IsTabStop="False" x:Name="btn_home" FontFamily="./resources/#Segoe WP" Content="home" Margin="438,5,0,0" Width="46" Height="27" Grid.Column="1" Grid.RowSpan="2" Template="{DynamicResource NavLink}" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="{DynamicResource AccentColor}" Padding="0" BorderThickness="0,0,0,2" Click="btn_home_Click"/>
+        <Button IsTabStop="False" x:Name="btn_close" FontFamily="./resources/#Segoe WP" Content="hide" Margin="0,6,10,0" Width="37" Height="27" Grid.Column="1" Grid.RowSpan="2" Template="{DynamicResource NavLink}" HorizontalAlignment="Right" VerticalAlignment="Top" BorderBrush="{DynamicResource AccentColor}" BorderThickness="0" Padding="0" Click="btn_close_Click"/>
+        <Button IsTabStop="False" x:Name="btn_minimize" FontFamily="./resources/#Segoe WP" Content="minimum" Margin="0,6,53,0" Width="69" Height="27" Grid.Column="1" Template="{DynamicResource NavLink}" HorizontalAlignment="Right" VerticalAlignment="Top" BorderBrush="{DynamicResource AccentColor}" BorderThickness="0" Padding="0" Click="btn_minimize_Click" Grid.RowSpan="2" />
+        <Button IsTabStop="False" x:Name="btn_settings" FontFamily="./resources/#Segoe WP" Content="settings" Margin="0,6,125,0" Width="58" Height="27" Grid.Column="1" Template="{DynamicResource NavLink}" HorizontalAlignment="Right" VerticalAlignment="Top" BorderBrush="{DynamicResource AccentColor}" BorderThickness="0" Padding="0" Click="btn_settings_Click" Grid.RowSpan="2" />
+        <Button IsTabStop="False" x:Name="btn_chat" FontFamily="./resources/#Segoe WP" Content="chat" Margin="0,6,189,0" Width="36" Height="27" Grid.Column="1" Template="{DynamicResource NavLink}" HorizontalAlignment="Right" VerticalAlignment="Top" BorderBrush="{DynamicResource AccentColor}" BorderThickness="0" Padding="0" Click="btn_chat_Click" Grid.RowSpan="2" />
+        <Button IsTabStop="False" x:Name="btn_contacts" FontFamily="./resources/#Segoe WP" Content="contacts" Margin="0,6,231,0" Width="62" Height="27" Grid.Column="1" Template="{DynamicResource NavLink}" HorizontalAlignment="Right" VerticalAlignment="Top" BorderBrush="{DynamicResource AccentColor}" BorderThickness="0" Padding="0" Click="btn_contacts_Click" Grid.RowSpan="2" />
+        <Button IsTabStop="False" x:Name="btn_home" FontFamily="./resources/#Segoe WP" Content="home" Margin="0,6,299,0" Width="46" Height="27" Grid.Column="1" Template="{DynamicResource NavLink}" HorizontalAlignment="Right" VerticalAlignment="Top" BorderBrush="{DynamicResource AccentColor}" Padding="0" BorderThickness="0,0,0,2" Click="btn_home_Click" Grid.RowSpan="2" />
 
 
         <!--Label x:Name="btn_settings" Content="settings" Grid.Column="1" HorizontalAlignment="Left" Margin="597,3,0,0" VerticalAlignment="Top" Foreground="#FFE0E0E0" FontSize="14" FontFamily="Segoe WP" Grid.RowSpan="2" Cursor="Hand" MouseDown="btn_settings_MouseDown"  BorderBrush="{DynamicResource AccentColor}" />
         <Label x:Name="btn_chat" Content="chat" Grid.Column="1" HorizontalAlignment="Left" Margin="556,3,0,0" VerticalAlignment="Top" Foreground="#FFE0E0E0" FontSize="14" FontFamily="Segoe WP" Grid.RowSpan="2" Cursor="Hand" MouseDown="btn_chat_MouseDown"  BorderBrush="{DynamicResource AccentColor}" />
         <Label x:Name="btn_contacts" Content="contacts" Grid.Column="1" HorizontalAlignment="Left" Margin="489,3,0,0" VerticalAlignment="Top" Foreground="#FFE0E0E0" FontSize="14" FontFamily="Segoe WP" Grid.RowSpan="2" Cursor="Hand" MouseDown="btn_contacts_MouseDown"  BorderBrush="{DynamicResource AccentColor}" />
         <Label x:Name="btn_home" Content="home" Grid.Column="1" HorizontalAlignment="Left" Margin="438,3,0,0" VerticalAlignment="Top" Foreground="#FFE0E0E0" FontSize="14" FontFamily="Segoe WP" Grid.RowSpan="2" Cursor="Hand" BorderBrush="{DynamicResource AccentColor}" BorderThickness="0,0,0,2" MouseDown="btn_home_MouseDown" /-->
-        <local:page_home x:Name="page_Home" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Top" Height="492" Width="780" Margin="0" Visibility="Hidden"/>
-        <local:page_contacts x:Name="page_Contacts" Grid.Column="1" HorizontalAlignment="Left" Margin="0,0,0,0" Grid.Row="2" VerticalAlignment="Top" Height="492" Width="780" Visibility="Hidden"/>
-        <local:page_chat x:Name="page_Chat" Grid.Column="1" HorizontalAlignment="Left" Margin="0,0,0,0" Grid.Row="2" VerticalAlignment="Top" Height="492" Width="780" Visibility="Hidden"/>
+        <local:page_home x:Name="page_Home" Grid.Column="1" HorizontalAlignment="Stretch" Grid.Row="2" VerticalAlignment="Stretch" Margin="0" Visibility="Hidden"/>
+        <local:page_contacts x:Name="page_Contacts" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,0" Grid.Row="2" VerticalAlignment="Stretch" Visibility="Hidden"/>
+        <local:page_chat x:Name="page_Chat" Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,0" Grid.Row="2" VerticalAlignment="Stretch" Visibility="Hidden"/>
         <local:page_settings x:Name="page_Settings" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Top" Height="492" Width="780" Visibility="Hidden"/>
 
-        <local:page_login x:Name="page_Login" Grid.ColumnSpan="2" Grid.Row="2" VerticalAlignment="Top" Height="492" Margin="0" Padding="0"/>
+        <local:page_login x:Name="page_Login" Grid.ColumnSpan="2" Grid.Row="2" VerticalAlignment="Stretch" Margin="0" Padding="0"/>
 
         <ListBox IsTabStop="False" x:Name="listbox1" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="70" Grid.Row="2" Background="{x:Null}" BorderBrush="{x:Null}" Margin="0,2,0,-2" SelectionChanged="listbox1_SelectionChanged">
             <ListBox.ItemTemplate>
@@ -141,8 +141,8 @@
             </TextBox.Resources>
         </TextBox>
 
-        <Button IsTabStop="False" Cursor="Hand" Template="{DynamicResource AddFriend}" Name="btn_AddFriend" Grid.Column="1" Margin="560,34,0,0" Grid.Row="1" Width="25" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="btn_AddFriend_Click" />
-        <Button IsTabStop="False" Cursor="Hand" Template="{DynamicResource ProfileSettings}" Name="btn_ProfileSettings" Grid.Column="1" Margin="525,34,0,0" Grid.Row="1" Width="25" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="btn_ProfileSettings_Click">
+        <Button IsTabStop="False" Cursor="Hand" Template="{DynamicResource AddFriend}" Name="btn_AddFriend" Grid.Column="1" Margin="0,34,194,0" Grid.Row="1" Width="25" Height="25" HorizontalAlignment="Right" VerticalAlignment="Top" Click="btn_AddFriend_Click" />
+        <Button IsTabStop="False" Cursor="Hand" Template="{DynamicResource ProfileSettings}" Name="btn_ProfileSettings" Grid.Column="1" Margin="0,34,225,0" Grid.Row="1" Width="25" Height="25" HorizontalAlignment="Right" VerticalAlignment="Top" Click="btn_ProfileSettings_Click">
             <Button.ContextMenu>
                 <ContextMenu Name="ProfileSettingsMenu">
                     <ContextMenu.ItemsSource>
@@ -165,9 +165,10 @@
             </Button.ContextMenu>
         </Button>
 
-        <local:Control_AddFriend x:Name="AddFriendWindow" BorderBrush="{DynamicResource AccentColor}" Margin="448,65,0,0" Width="250" Height="80" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" Visibility="Collapsed" />
+        <local:Control_AddFriend x:Name="AddFriendWindow" BorderBrush="{DynamicResource AccentColor}" Margin="0,65,80,0" Width="250" Height="80" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" Visibility="Collapsed" />
         
         <TextBlock x:Name="txt_debug" Visibility="Collapsed" FontFamily="./resources/#Segoe WP" HorizontalAlignment="Center" Margin="0,465,0,0" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Center" Height="17" Width="850" Foreground="White" Text="Blaze Games IM Version: PREVIEW    Startup Time: 0ms    Initalize Time: 0ms    Show Time: 0ms    Server Ping Time: 0ms" Grid.ColumnSpan="2" TextAlignment="Center"/>
+        <Rectangle Grid.Row="2" Height="15" HorizontalAlignment="Right" Margin="0" VerticalAlignment="Bottom" Width="15" Grid.Column="1" Cursor="SizeNWSE" Name="resize" PreviewMouseDown="resize_PreviewMouseDown" Stroke="Transparent" Fill="Transparent" />
     </Grid>
 </Window>
 

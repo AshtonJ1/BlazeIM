@@ -46,6 +46,8 @@ namespace BlazeGames.IM.Client
         {
             InitializeComponent();
 
+            this.SourceInitialized += new EventHandler(MainWindow_SourceInitialized);
+
             SlideFade.StartAnimationIn(this);
 
             view = new ListCollectionView(App.Instance.OpenChats);
@@ -62,6 +64,34 @@ namespace BlazeGames.IM.Client
             dialog.Filter = "Image Files|*.png;*.jpg;*.bmp;*.jpeg";
             dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
             dialog.FileOk += new CancelEventHandler(dialog_FileOk);
+        }
+
+        private const int WM_SYSCOMMAND = 0x112;
+        private HwndSource hwndSource;
+
+        void MainWindow_SourceInitialized(object sender, EventArgs e)
+        {
+            hwndSource = PresentationSource.FromVisual((Visual)sender) as HwndSource;
+        }
+
+        public enum ResizeDirection
+        {
+            Left = 1,
+            Right = 2,
+            Top = 3,
+            TopLeft = 4,
+            TopRight = 5,
+            Bottom = 6,
+            BottomLeft = 7,
+            BottomRight = 8,
+        }
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        private void ResizeWindow(ResizeDirection direction)
+        {
+            SendMessage(hwndSource.Handle, WM_SYSCOMMAND, (IntPtr)(61440 + direction), IntPtr.Zero);
         }
 
         #region AnimationHeight
@@ -650,6 +680,11 @@ namespace BlazeGames.IM.Client
         {
             this.ProfileSettingsMenu.PlacementTarget = btn_settings;
             this.ProfileSettingsMenu.IsOpen = true;
+        }
+
+        private void resize_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            ResizeWindow(ResizeDirection.BottomRight);
         }
     }
 

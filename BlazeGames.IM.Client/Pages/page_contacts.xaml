@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:BlazeGames.IM.Client" x:Class="BlazeGames.IM.Client.page_contacts" 
              mc:Ignorable="d" 
-             d:DesignHeight="492" d:DesignWidth="780" Loaded="UserControl_Loaded_1">
+             d:DesignHeight="492" d:DesignWidth="780" Loaded="UserControl_Loaded_1" SizeChanged="UserControl_SizeChanged">
     <UserControl.Resources>
         <ControlTemplate x:Key="ScrollViewerControlTemplate" TargetType="{x:Type ScrollViewer}">
             <Grid x:Name="Grid" Background="{TemplateBinding Background}">
@@ -141,7 +141,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
     
-    <ScrollViewer Template="{DynamicResource ScrollViewerControlTemplate}">
+    <ScrollViewer Template="{DynamicResource ScrollViewerControlTemplate}" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         
         
         

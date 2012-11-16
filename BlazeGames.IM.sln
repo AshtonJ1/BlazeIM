@@ -14,8 +14,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BlazeGames.Networking", "Bl
 		Shared\BlazeGames.Networking\ServerSocket.cs = Shared\BlazeGames.Networking\ServerSocket.cs
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazeGames.IM.TestPlugin", "BlazeGames.IM.TestPlugin\BlazeGames.IM.TestPlugin.csproj", "{79AAC61C-00B7-4DBD-ACE5-40683A4E9051}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazeGames.IM.Client.Web", "BlazeGames.IM.Client.Web\BlazeGames.IM.Client.Web.csproj", "{087B2079-BD1B-4585-8521-7B96F93885A9}"
 EndProject
 Global
@@ -48,16 +46,6 @@ Global
 		{427ACE16-2913-4820-9DCE-3B9B1DFACD2D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{427ACE16-2913-4820-9DCE-3B9B1DFACD2D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{427ACE16-2913-4820-9DCE-3B9B1DFACD2D}.Release|x86.ActiveCfg = Release|Any CPU
-		{79AAC61C-00B7-4DBD-ACE5-40683A4E9051}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{79AAC61C-00B7-4DBD-ACE5-40683A4E9051}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{79AAC61C-00B7-4DBD-ACE5-40683A4E9051}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{79AAC61C-00B7-4DBD-ACE5-40683A4E9051}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{79AAC61C-00B7-4DBD-ACE5-40683A4E9051}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{79AAC61C-00B7-4DBD-ACE5-40683A4E9051}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{79AAC61C-00B7-4DBD-ACE5-40683A4E9051}.Release|Any CPU.Build.0 = Release|Any CPU
-		{79AAC61C-00B7-4DBD-ACE5-40683A4E9051}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{79AAC61C-00B7-4DBD-ACE5-40683A4E9051}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{79AAC61C-00B7-4DBD-ACE5-40683A4E9051}.Release|x86.ActiveCfg = Release|Any CPU
 		{087B2079-BD1B-4585-8521-7B96F93885A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{087B2079-BD1B-4585-8521-7B96F93885A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{087B2079-BD1B-4585-8521-7B96F93885A9}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

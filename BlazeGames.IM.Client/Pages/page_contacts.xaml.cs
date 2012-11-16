@@ -25,7 +25,9 @@ namespace BlazeGames.IM.Client
             InitializeComponent();
         }
 
-        public void Draw()
+        private int LastControlsPerRow = 0;
+
+        public void Draw(bool Resize=false)
         {
             try
             {
@@ -37,6 +39,22 @@ namespace BlazeGames.IM.Client
 
                     if (App.Instance.Contacts.Count > 0)
                     {
+                        int ControlsPerRow = 0;
+                        int Tmp_i = 0;
+                        while (true)
+                        {
+                            if(Tmp_i + 257 > this.ActualWidth)
+                                break;
+
+                            Tmp_i += 257;
+                            ControlsPerRow++;
+                        }
+
+                        if (Resize && ControlsPerRow == LastControlsPerRow)
+                            return;
+
+                        LastControlsPerRow = ControlsPerRow;
+
                         int ContactCount = 0;
                         Contact LastContact = null;
                         int i = 0;
@@ -57,7 +75,7 @@ namespace BlazeGames.IM.Client
                                 ContactCount++;
                                 LastContact = contact;
 
-                                if (i == 3)
+                                if (i == ControlsPerRow)
                                 {
                                     j++;
                                     i = 0;
@@ -101,7 +119,7 @@ namespace BlazeGames.IM.Client
                                 ContactCount++;
                                 LastContact = contact;
 
-                                if (i == 3)
+                                if (i == ControlsPerRow)
                                 {
                                     j++;
                                     i = 0;
@@ -145,7 +163,7 @@ namespace BlazeGames.IM.Client
                                 ContactCount++;
                                 LastContact = contact;
 
-                                if (i == 3)
+                                if (i == ControlsPerRow)
                                 {
                                     j++;
                                     i = 0;
@@ -189,7 +207,7 @@ namespace BlazeGames.IM.Client
                                 ContactCount++;
                                 LastContact = contact;
 
-                                if (i == 3)
+                                if (i == ControlsPerRow)
                                 {
                                     j++;
                                     i = 0;
@@ -270,6 +288,11 @@ namespace BlazeGames.IM.Client
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
             Draw();
+        }
+
+        private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Draw(true);
         }
     }
 }
