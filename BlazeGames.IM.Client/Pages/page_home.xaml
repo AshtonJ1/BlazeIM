@@ -3,9 +3,25 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:fluidkit="clr-namespace:FluidKit.Controls;assembly=FluidKit"
              mc:Ignorable="d" 
              d:DesignHeight="492" d:DesignWidth="780">
+    <UserControl.Resources>
+        <DataTemplate x:Key="ItemTemplate">
+            <Border BorderBrush="#FFB1B1B1"
+                    BorderThickness="2"
+                    Background="#7FFFFFFF"
+                    Padding="0,20,0,0"
+                    CornerRadius="3">
+                <Image Source="{Binding Image}"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       Stretch="Fill" />
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
     <Grid>
+        <fluidkit:ElementFlow Name="InstalledApps" />
         <Label Content="Blaze Games Content" Height="28" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontFamily="./resources/#Segoe WP" Foreground="White" />
         <Label Content="Coming Soon" Height="28" Margin="0,40,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontFamily="./resources/#Segoe WP" Foreground="White" />
     </Grid>

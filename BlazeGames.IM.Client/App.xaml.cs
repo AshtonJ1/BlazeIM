@@ -103,6 +103,7 @@ namespace BlazeGames.IM.Client
         static Assembly toolkit = Assembly.Load(BlazeGames.IM.Client.Properties.Resources.WPFToolkit_Extended);
         static Assembly mahapps = Assembly.Load(BlazeGames.IM.Client.Properties.Resources.MahApps_Metro);
         static Assembly interactivity = Assembly.Load(BlazeGames.IM.Client.Properties.Resources.System_Windows_Interactivity);
+        static Assembly fluidkit = Assembly.Load(BlazeGames.IM.Client.Properties.Resources.FluidKit);
 
         static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
@@ -114,6 +115,7 @@ namespace BlazeGames.IM.Client
                 case "mahapps.metro": return mahapps;
                 case "wpftoolkit.extended": return toolkit;
                 case "system.windows.interactivity": return interactivity;
+                case "fluidkit": return fluidkit;
                 default:
                     Console.WriteLine("Failed To Load: {0}", args.Name);
                     return null;
@@ -290,7 +292,7 @@ namespace BlazeGames.IM.Client
                 Contact contact = Contacts[MemberID];
 
                 if (contact.status == Status.Offline && NewStatus != Status.Offline && ConfigManager.Instance.GetBool("txt_loginnotification", true) && ConfigManager.Instance.GetBool("txt_notifications", true))
-                    NotificationWindow.ShowNotification(String.Format("{0} Has Signed In", contact.NickName), String.Format("{0} has just signed in, click here to chat.", contact.NickName), contact);
+                    NotificationWindow.ShowNotification(String.Format("{0} Has Signed In", contact.NickName), String.Format("{0} has just signed in.", contact.NickName), contact);
                 if (contact.status != Status.Offline && NewStatus == Status.Offline && ConfigManager.Instance.GetBool("txt_logoutnotification", true) && ConfigManager.Instance.GetBool("txt_notifications", true))
                     NotificationWindow.ShowNotification(String.Format("{0} Has Signed Out", contact.NickName), String.Format("{0} has just signed out.", contact.NickName), contact);
 
@@ -697,6 +699,11 @@ namespace BlazeGames.IM.Client
             else if (BlazeGames.IM.Client.MainWindow.Instance.CurrentPage != "chat") { NotifyNewMessage(Message); }
             else if (BlazeGames.IM.Client.MainWindow.Instance.page_Chat.ChattingWith == null) { NotifyNewMessage(Message); }
             else if (BlazeGames.IM.Client.MainWindow.Instance.page_Chat.ChattingWith.ID != ID) { NotifyNewMessage(Message); }
+
+            if (BlazeGames.IM.Client.MainWindow.Instance.page_Chat.ChattingWith != null)
+                if (BlazeGames.IM.Client.MainWindow.Instance.page_Chat.ChattingWith.ID == ID)
+                    MarkAllMessagesRead();
+
 
             LastMessage = DateTime.Now;
         }

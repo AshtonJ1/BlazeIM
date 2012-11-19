@@ -7,7 +7,7 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary>
+                <ResourceDictionary> 
                     <SolidColorBrush x:Key="AccentColor" Color="#FF119EDA" />
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>

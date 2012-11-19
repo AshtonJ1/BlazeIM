@@ -62,6 +62,11 @@
     <ApplicationIcon>BG_Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FluidKit, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Resources\FluidKit.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="MahApps.Metro, Version=0.9.0.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MahApps.Metro.0.9.9.45-ALPHA\lib\net40\MahApps.Metro.dll</HintPath>
@@ -120,6 +125,9 @@
     <Compile Include="Controls\Control_Loading.xaml.cs">
       <DependentUpon>Control_Loading.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Notification.xaml.cs">
+      <DependentUpon>Notification.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\DynamicCanvas.cs" />
     <Compile Include="Controls\EnumerableFunctions.cs" />
     <Compile Include="Controls\NotificationWindow.xaml.cs">
@@ -161,6 +169,10 @@
     <Page Include="Controls\Control_Loading.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Notification.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\NotificationWindow.xaml">
       <SubType>Designer</SubType>
@@ -272,6 +284,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\WPFToolkit.Extended.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FluidKit.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

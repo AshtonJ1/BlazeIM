@@ -63,6 +63,16 @@ namespace BlazeGames.IM.Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] FluidKit {
+            get {
+                object obj = ResourceManager.GetObject("FluidKit", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] MahApps_Metro {
             get {
                 object obj = ResourceManager.GetObject("MahApps_Metro", resourceCulture);

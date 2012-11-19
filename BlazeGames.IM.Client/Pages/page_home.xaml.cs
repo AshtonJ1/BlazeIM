@@ -27,7 +27,9 @@ namespace BlazeGames.IM.Client
             InitializeComponent();
 
             Appview = new ListCollectionView(Plugins.PluginsManager.Instance.Plugins);
-            //list_apps.ItemsSource = Appview;
+            InstalledApps.Items.Add("Test");
+            InstalledApps.Items.Add("Test2");
+            InstalledApps.Items.Add("Test3");
         }
     }
 }
