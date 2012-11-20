@@ -17,13 +17,17 @@ namespace BlazeGames.IM.Server.Networking
             PAK_CLI_SNDMSG          = 0x03,     //  MessageSend(Message) 
             PAK_CLI_CHNGSTSRQST     = 0x05,     //  ChangeStatusRequest(NewStatus)     
             PAK_CLI_CHNGUPDTRQST    = 0x06,     //  ChangeUpdateRequest(NewUpdate)
-            PAK_CLI_CHNGIMGRQST     = 0x07,     //  ChangeProfileImageRequest()        *
+            PAK_CLI_CHNGIMGRQST     = 0x07,     //  ChangeProfileImageRequest()        
             PAK_CLI_MEMINFORQST     = 0x08,     //  MemberInfoRequest(ID)
             PAK_CLI_FRNDADDRQST     = 0x09,     //  FriendAddRequest(ID)
             PAK_CLI_FRNDDNYRQST     = 0x11,     //  FriendDenyRequest(ID)              
-            PAK_CLI_FRNDBLKRQST     = 0x12,     //  FriendBlockRequest(ID)             *
+            PAK_CLI_FRNDBLKRQST     = 0x12,     //  FriendBlockRequest(ID)             
             PAK_CLI_FRNDRMVRQST     = 0x13,     //  FriendRemoveRequest(ID)            
             PAK_CLI_OFFLNMSGRQST    = 0x14,     //  OfflineMessageRequest()
+
+            PAK_CLI_GRP_INV         = 0x15,     //  GroupInviteRequest(GroupID, MemID)              *
+            PAK_CLI_GRP_LEAVE       = 0x16,     //  GroupLeave(GroupID)                             *
+            PAK_CLI_GRP_SNDMSG      = 0x17,     //  GroupSendMessage(GroupID, Message)              *
 
             // PAK_SRV
             PAK_SRV_LGNRESP         = 0x51,     //  LoginResponse(ResponseCode, ID, Nickname, Status)
@@ -34,7 +38,11 @@ namespace BlazeGames.IM.Server.Networking
             PAK_SRV_FRNDRQSTDLVR    = 0x56,     //  FriendRequestDeliver(FromID)
             PAK_SRV_NEWSTSDLVR      = 0x58,     //  NewStatusDeliver(ID, NewStatus)
             PAK_SRV_NEWUPDTDLVR     = 0x59,     //  NewUpdateDeliver(ID, NewUpdate)
-            PAK_SRV_FRNDRMVDLVR     = 0x61;     //  FriendRemoveDeliver(ID)
+            PAK_SRV_FRNDRMVDLVR     = 0x61,     //  FriendRemoveDeliver(ID)
+
+            PAK_SRV_GRP_MSGDLVR     = 0x62,     //  GroupMessageDelver(GroupID, FromID, Message)    *
+            PAK_SRV_GRP_JOINDLVR    = 0x63,     //  GroupJoinDeliver(GroupID, MemID)                *
+            PAK_SRV_GRP_LEAVDLVR    = 0x64;     //  GroupLeaveDeliver(GroupID, MemID)               *
     }
 
     class PacketHandlers

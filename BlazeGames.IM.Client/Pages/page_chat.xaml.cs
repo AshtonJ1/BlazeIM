@@ -27,12 +27,19 @@ namespace BlazeGames.IM.Client
     internal partial class page_chat : UserControl
     {
         public Contact ChattingWith = null;
+        public List<string> Uploads = new List<string>();
 
         public void StartChattingWith(Contact contact)
         {
             if(ChattingWith != null)
             if (ChattingWith.ID == contact.ID)
                 return;
+
+            if (Uploads.Count > 0)
+            {
+                NotificationWindow.ShowNotification("Upload In Progress", string.Format("Unable to start chatting with {0} since you are currently uploading files.", contact.NickName));
+                return;
+            }
 
             new Thread(new ThreadStart(delegate
                 {
@@ -60,6 +67,9 @@ namespace BlazeGames.IM.Client
 
                     foreach (Message msg in contact.Messages)
                     {
+                        if ((msg.SendTime - DateTime.Now).Days > 7)
+                            continue;
+
                         this.Dispatcher.Invoke((App.MethodInvoker)delegate
                         {
                             HandleMessage(msg.From, msg.Msg);
@@ -239,11 +249,18 @@ namespace BlazeGames.IM.Client
             System.Drawing.Image img = ImageWpfToGDI(img_wpf);
             string UID = Guid.NewGuid().ToString().Replace("-", "");
             int lastprogress = 0;
+
             
+
             MemoryStream ImageStream = new MemoryStream();
             img.Save(ImageStream, System.Drawing.Imaging.ImageFormat.Png);
 
             byte[] image = BlazeGames.IM.Client.Core.Utilities.Compress(ImageStream.ToArray());
+            if (image.Length > 10485760)
+            {
+                NotificationWindow.ShowNotification("Upload Failed", "The image you are trying to upload is larger than 10MB when compressed.");
+                return;
+            }
 
             HandleMessage(App.NickName, @"<Span xmlns=""default"">
 <Grid Name=""upload_" + UID + @"_control"" Background=""Transparent"" Width=""400"" Height=""100"">
@@ -262,8 +279,11 @@ namespace BlazeGames.IM.Client
 
             using (WebClient wc = new WebClient())
             {
+                Uploads.Add(UID);
+
                 wc.UploadDataCompleted += (sender, e) =>
                     {
+                        Uploads.Remove(UID);
                         string Url = Encoding.Default.GetString(e.Result);
                         UpdateUploadComplete(UID, Url);
 
@@ -308,7 +328,11 @@ namespace BlazeGames.IM.Client
                     string Url = control.Tag as string;
                     control.PreviewMouseDown += (sender, e) =>
                         {
-                            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(Url));
+                            try
+                            {
+                                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(Url));
+                            }
+                            catch { }
                         };
                 }
             }
@@ -355,7 +379,11 @@ namespace BlazeGames.IM.Client
                 if (control.Name.EndsWith("_progresstxt"))
                 {
                     Label progresstext = control as Label;
-                    progresstext.Content = Url;
+
+                    if (Url == "")
+                        progresstext.Content = "Upload Failed";
+                    else
+                        progresstext.Content = Url;
                 }
             }
         }
@@ -477,11 +505,20 @@ namespace BlazeGames.IM.Client
                     if(!fi.Exists)
                         continue;
 
+                    bool IsImage = (fi.Extension == ".png" || fi.Extension == ".jpg" || fi.Extension == ".gif");
+
                     string icon = "http://blaze-games.com/files/icon/file-" + fi.Name + "/";
 
                     string UID = Guid.NewGuid().ToString().Replace("-", "");
                     int lastprogress = 0;
-                    byte[] filedata = BlazeGames.IM.Client.Core.Utilities.Compress(File.ReadAllBytes(fi.FullName));
+                    byte[] DeCompressedFileData = File.ReadAllBytes(fi.FullName);
+                    byte[] filedata = BlazeGames.IM.Client.Core.Utilities.Compress(DeCompressedFileData);
+
+                    if(filedata.Length >= 10485760)
+                    {
+                        NotificationWindow.ShowNotification("Upload Failed", "The file " + fi.Name + " is larger than 10MB when compressed.");
+                        return;
+                    }
 
                     HandleMessage(App.NickName, @"<Span xmlns=""default"">
 <Grid Name=""upload_" + UID + @"_control"" Background=""Transparent"" Width=""400"" Height=""100"">
@@ -496,14 +533,23 @@ namespace BlazeGames.IM.Client
 </Grid>
 <LineBreak />
 </Span>");
-                    UpdateUploadThumbnail(UID, new System.Windows.Media.Imaging.BitmapImage(new Uri(icon)));
+                    if(IsImage)
+                        UpdateUploadThumbnail(UID, new System.Windows.Media.Imaging.BitmapImage(new Uri(fi.FullName)));
+                    else
+                        UpdateUploadThumbnail(UID, new System.Windows.Media.Imaging.BitmapImage(new Uri(icon)));
 
                     using (WebClient wc = new WebClient())
                     {
+                        Uploads.Add(UID);
+
                         wc.UploadDataCompleted += (sender, e) =>
                         {
+                            Uploads.Remove(UID);
                             string Url = Encoding.Default.GetString(e.Result);
                             UpdateUploadComplete(UID, Url);
+
+                            if (IsImage)
+                                icon = Url;
 
                             ChattingWith.SendMessage(@"<Span xmlns=""default"">
 <Grid Name=""upload_" + UID + @"_control"" Cursor=""Hand"" Background=""Transparent"" Width=""400"" Height=""100"" Tag=""" + Url + @""">
