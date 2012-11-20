@@ -37,7 +37,7 @@
         </ResourceDictionary>
     </Window.Resources>
     <Window.Background>
-        <ImageBrush ImageSource="pack://application:,,,/Resources/BGIM_BG.png"/>
+        <ImageBrush ImageSource="Resources/BGIM_BG.png"/>
     </Window.Background>
     
     <Grid Name="grid">

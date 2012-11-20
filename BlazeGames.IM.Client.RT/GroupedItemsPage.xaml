@@ -44,7 +44,7 @@
             Grid.RowSpan="2"
             Padding="116,137,40,46"
             ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
-            ItemTemplate="{StaticResource Standard250x250ItemTemplate}"
+            ItemTemplate="{StaticResource Standard300x50ItemTemplate}"
             SelectionMode="None"
             IsSwipeEnabled="false"
             IsItemClickEnabled="True"
@@ -62,7 +62,6 @@
                             <Grid Margin="1,0,0,6">
                                 <Button
                                     AutomationProperties.Name="Group Title"
-                                    Click="Header_Click"
                                     Style="{StaticResource TextPrimaryButtonStyle}" >
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="{Binding Title}" Margin="3,-7,10,10" Style="{StaticResource GroupHeaderTextStyle}" />
@@ -92,7 +91,7 @@
             Padding="10,0,0,60"
             ItemsSource="{Binding Source={StaticResource groupedItemsViewSource}}"
             ItemTemplate="{StaticResource Standard80ItemTemplate}"
-            SelectionMode="None"
+            SelectionMode="Multiple"
             IsSwipeEnabled="false"
             IsItemClickEnabled="True"
             ItemClick="ItemView_ItemClick">
@@ -125,7 +124,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Button x:Name="backButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=pageRoot}" Style="{StaticResource BackButtonStyle}"/>
-            <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Grid.Column="1" IsHitTestVisible="false" Style="{StaticResource PageHeaderTextStyle}"/>
+            <TextBlock x:Name="pageTitle" Text="Blaze IM" Grid.Column="1" IsHitTestVisible="false" Style="{StaticResource PageHeaderTextStyle}"/>
         </Grid>
 
         <VisualStateManager.VisualStateGroups>

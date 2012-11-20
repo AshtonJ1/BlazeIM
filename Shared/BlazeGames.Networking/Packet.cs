@@ -21,7 +21,7 @@ namespace BlazeGames.Networking
         /// <summary>
         /// Gets or Sets the maximum packet length
         /// </summary>
-        public static int MaxLength = 2048;
+        public static int MaxLength = 20480;
 
         /// <summary>
         /// Creates a packet with the following data

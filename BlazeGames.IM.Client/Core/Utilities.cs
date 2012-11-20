@@ -5,6 +5,8 @@ using System.Text;
 using System.Security.Cryptography;
 using System.Net;
 using System.Collections.Specialized;
+using System.IO.Compression;
+using System.IO;
 
 namespace BlazeGames.IM.Client.Core
 {
@@ -46,12 +48,58 @@ Stack Trace
             }
         }
 
-        static void wc_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
+        public static void UploadImage(System.Drawing.Image img, Contact SendTo)
         {
-            if (e.Error != null)
-                Console.WriteLine(e.Error.ToString());
-            else
-                Console.WriteLine(e.Result);
+            MemoryStream ImageStream = new MemoryStream();
+            img.Save(ImageStream, System.Drawing.Imaging.ImageFormat.Png);
+
+            byte[] image = Compress(ImageStream.ToArray());
+            using (WebClient wc = new WebClient())
+            {
+                wc.UploadDataCompleted += (sender, e) =>
+                {
+                    string Url = Encoding.Default.GetString(e.Result);
+                    SendTo.SendMessage(string.Format("<Span xmlns=\"default\"><Image Source=\"{0}\" /></Span>", Url));
+                    System.Windows.MessageBox.Show(Url);
+                };
+
+                wc.UploadDataAsync(new Uri("http://blaze-games.com/files/upload/&file_name=UploadedImage.png"), image);
+            }
         }
+
+        #region Compression
+        public static byte[] Decompress(byte[] zippedData)
+        {
+            byte[] decompressedData = null;
+            using (MemoryStream outputStream = new MemoryStream())
+            {
+                using (MemoryStream inputStream = new MemoryStream(zippedData))
+                {
+                    using (GZipStream zip = new GZipStream(inputStream, CompressionMode.Decompress))
+                    {
+                        zip.CopyTo(outputStream);
+                    }
+                }
+                decompressedData = outputStream.ToArray();
+            }
+
+            return decompressedData;
+        }
+
+        public static byte[] Compress(byte[] plainData)
+        {
+            byte[] compressesData = null;
+            using (MemoryStream outputStream = new MemoryStream())
+            {
+                using (GZipStream zip = new GZipStream(outputStream, CompressionMode.Compress))
+                {
+                    zip.Write(plainData, 0, plainData.Length);
+                }
+                compressesData = outputStream.ToArray();
+            }
+
+            return compressesData;
+        }
+        #endregion
     }
 }

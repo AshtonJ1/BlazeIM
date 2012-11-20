@@ -1671,6 +1671,23 @@
         </Grid>
     </DataTemplate>
 
+    <!-- Grid-appropriate 500 by 130 pixel item template as seen in the GroupDetailPage -->
+    <DataTemplate x:Key="Standard300x50ItemTemplate">
+        <Grid Height="50" Width="300" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Border Background="{StaticResource ListViewItemPlaceholderBackgroundThemeBrush}" Width="50" Height="50">
+                <Image Source="{Binding Image}" Stretch="UniformToFill" AutomationProperties.Name="{Binding Title}"/>
+            </Border>
+            <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="10,0,0,0">
+                <TextBlock Text="{Binding Title}" Style="{StaticResource TitleTextStyle}" TextWrapping="NoWrap"/>
+                <TextBlock Text="{Binding Subtitle}" Style="{StaticResource CaptionTextStyle}" TextWrapping="Wrap"/>
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
+
     <!-- List-appropriate 130 pixel high item template as seen in the SplitPage -->
     <DataTemplate x:Key="Standard130ItemTemplate">
         <Grid Height="110" Margin="6">

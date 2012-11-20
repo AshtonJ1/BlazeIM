@@ -2,6 +2,7 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <ExpressionBlendVersion>5.0.30709.0</ExpressionBlendVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -133,6 +134,9 @@
     <Compile Include="Controls\NotificationWindow.xaml.cs">
       <DependentUpon>NotificationWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\UploadFileControl.xaml.cs">
+      <DependentUpon>UploadFileControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Core\ConfigManager.cs" />
     <Compile Include="Core\Notify.cs" />
     <Compile Include="Core\PluginManager.cs" />
@@ -175,6 +179,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\NotificationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\UploadFileControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -287,6 +295,27 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\FluidKit.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ico_default.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ico_dll.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ico_html.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ico_ini.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ico_mov.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ico_music.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ico_pdf.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

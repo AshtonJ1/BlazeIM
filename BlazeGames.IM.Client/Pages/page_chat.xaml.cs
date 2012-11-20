@@ -17,6 +17,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Media.Animation;
 using System.Threading;
 using System.Diagnostics;
+using System.Net;
 
 namespace BlazeGames.IM.Client
 {
@@ -86,6 +87,9 @@ namespace BlazeGames.IM.Client
             this.rtf_input.InputBindings.Add(Input_Return_Keybinding);
             this.rtf_input.CommandBindings.Add(Input_Return_Binding);
 
+            CommandBinding pasteCmdBinding = new CommandBinding(ApplicationCommands.Paste, OnPaste, OnCanExecutePaste);
+            this.rtf_input.CommandBindings.Add(pasteCmdBinding);
+
             try
             {
                 this.rtf_input.FontSize = Convert.ToDouble(ConfigManager.Instance.GetString("font_size", "12"));
@@ -93,6 +97,35 @@ namespace BlazeGames.IM.Client
                 this.rtf_input.Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(ConfigManager.Instance.GetString("font_color", "#000000"));
             }
             catch { }
+
+            this.rtf_input.AddHandler(RichTextBox.DragOverEvent, new DragEventHandler(rtf_DragOver), true);
+            this.rtf_input.AddHandler(RichTextBox.DropEvent, new DragEventHandler(rtf_DragDrop), true);
+        }
+
+        private void OnPaste(object sender, ExecutedRoutedEventArgs e)
+        {
+            RichTextBox richTextBox = sender as RichTextBox;
+            if (richTextBox == null) { return; }
+
+            var dataObj = (IDataObject)Clipboard.GetDataObject();
+            if (dataObj == null) { return; }
+
+            if (Clipboard.ContainsImage())
+            {
+                var imgSrc = Clipboard.GetImage();
+                this.UploadImage(imgSrc);
+
+                e.Handled = true;
+            }
+        }
+
+
+        private void OnCanExecutePaste(object target, CanExecuteRoutedEventArgs args)
+        {
+            if (Clipboard.ContainsImage())
+                args.CanExecute = true;
+            else
+                args.CanExecute = false;
         }
 
         string LastMessageFrom = "";
@@ -117,6 +150,7 @@ namespace BlazeGames.IM.Client
                 rtf_output.Selection.Load(new MemoryStream(Encoding.Default.GetBytes(Message.Replace("xmlns=\"default\"", "xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\""))), DataFormats.Xaml);
                 rtf_output.ScrollToEnd();
                 SubscribeToAllHyperlinks(rtf_output.Document);
+                LinkAllUploads();
             }
             catch (Exception ex)
             {
@@ -134,8 +168,6 @@ namespace BlazeGames.IM.Client
 
         void Input_SentMessage_Execute(object target, ExecutedRoutedEventArgs e)
         {
-            UploadAllImages();
-
             rtf_input.SelectAll();
             if (rtf_input.Selection.Text.Trim() == "")
             {
@@ -181,15 +213,14 @@ namespace BlazeGames.IM.Client
             }
         }
 
-        void UploadAllImages()
+        private System.Drawing.Image ImageWpfToGDI(BitmapSource image)
         {
-            var images = GetVisuals(rtf_input.Document).OfType<Image>();
-            foreach (var image in images)
-                try
-                {
-                    //TODO: Upload image and replace it with a link
-                }
-                catch { }
+            MemoryStream ms = new MemoryStream();
+            var encoder = new System.Windows.Media.Imaging.BmpBitmapEncoder();
+            encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(image));
+            encoder.Save(ms);
+            ms.Flush();
+            return System.Drawing.Image.FromStream(ms);
         }
 
         void SubscribeToAllHyperlinks(FlowDocument flowDocument)
@@ -201,6 +232,158 @@ namespace BlazeGames.IM.Client
                     link.RequestNavigate += new System.Windows.Navigation.RequestNavigateEventHandler(link_RequestNavigate);
                 }
                 catch { }
+        }
+
+        void UploadImage(BitmapSource img_wpf)
+        {
+            System.Drawing.Image img = ImageWpfToGDI(img_wpf);
+            string UID = Guid.NewGuid().ToString().Replace("-", "");
+            int lastprogress = 0;
+            
+            MemoryStream ImageStream = new MemoryStream();
+            img.Save(ImageStream, System.Drawing.Imaging.ImageFormat.Png);
+
+            byte[] image = BlazeGames.IM.Client.Core.Utilities.Compress(ImageStream.ToArray());
+
+            HandleMessage(App.NickName, @"<Span xmlns=""default"">
+<Grid Name=""upload_" + UID + @"_control"" Background=""Transparent"" Width=""400"" Height=""100"">
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width=""100""/>
+        <ColumnDefinition Width=""*""/>
+    </Grid.ColumnDefinitions>
+    <ProgressBar Name=""upload_" + UID + @"_progress"" HorizontalAlignment=""Stretch"" Height=""20"" Margin=""15,42,15,15"" VerticalAlignment=""Center"" Grid.Column=""1""/>
+    <Image Name=""upload_" + UID + @"_thumbnail"" Grid.Column=""0"" HorizontalAlignment=""Stretch"" Margin=""15"" VerticalAlignment=""Stretch""/>
+    <Label Name=""upload_" + UID + @"_filename"" Content=""UploadedImage.png"" Grid.Column=""1"" Margin=""15,15,15,40"" VerticalAlignment=""Center"" FontSize=""18"" Foreground=""#FF363636""  />
+    <Label Name=""upload_" + UID + @"_progresstxt"" Content=""Uploading (0%)..."" Grid.Column=""1"" Margin=""15,42,15,15"" VerticalAlignment=""Center"" FontSize=""14"" Foreground=""#FF5F5F5F""  />
+</Grid>
+<LineBreak />
+</Span>");
+            UpdateUploadThumbnail(UID, img_wpf);
+
+            using (WebClient wc = new WebClient())
+            {
+                wc.UploadDataCompleted += (sender, e) =>
+                    {
+                        string Url = Encoding.Default.GetString(e.Result);
+                        UpdateUploadComplete(UID, Url);
+
+                        ChattingWith.SendMessage(@"<Span xmlns=""default"">
+<Grid Name=""upload_" + UID + @"_control"" Cursor=""Hand"" Background=""Transparent"" Width=""400"" Height=""100"" Tag=""" + Url + @""">
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width=""100""/>
+        <ColumnDefinition Width=""*""/>
+    </Grid.ColumnDefinitions>
+    <Image Name=""upload_" + UID + @"_thumbnail"" Grid.Column=""0"" HorizontalAlignment=""Stretch"" Margin=""15"" VerticalAlignment=""Stretch"" Source=""" + Url + @"""/>
+    <Label Name=""upload_" + UID + @"_filename"" Content=""UploadedImage.png"" Grid.Column=""1"" Margin=""15,15,15,40"" VerticalAlignment=""Center"" FontSize=""18"" Foreground=""#FF363636""  />
+    <Label Name=""upload_" + UID + @"_progresstxt"" Content=""" + Url + @""" Grid.Column=""1"" Margin=""15,42,15,15"" VerticalAlignment=""Center"" FontSize=""14"" Foreground=""#FF5F5F5F""  />
+</Grid>
+<LineBreak />
+</Span>");
+                    };
+
+                wc.UploadProgressChanged += (sender, e) =>
+                    {
+
+                        if (lastprogress != e.ProgressPercentage)
+                        {
+                            UpdateUploadProgress(UID, (e.ProgressPercentage * 2) - 1);
+                        }
+
+                        lastprogress = e.ProgressPercentage;
+                    };
+
+                wc.UploadDataAsync(new Uri("http://blaze-games.com/files/upload/&file_name=UploadedImage.png"), image);
+            }
+
+        }
+
+        void LinkAllUploads()
+        {
+            var UploadControls = GetVisuals(rtf_output.Document).OfType<Grid>().Where(control => ((Grid)control).Name.StartsWith("upload_") && ((Grid)control).Name.EndsWith("_control"));
+
+            foreach (Grid control in UploadControls)
+            {
+                if (control.Tag != null)
+                {
+                    string Url = control.Tag as string;
+                    control.PreviewMouseDown += (sender, e) =>
+                        {
+                            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(Url));
+                        };
+                }
+            }
+        }
+
+        void UpdateUploadThumbnail(string UID, ImageSource source)
+        {
+            var UploadControls = GetVisuals(rtf_output.Document).OfType<Image>().Where(control => ((Image)control).Name.StartsWith("upload_" + UID + "_thumbnail"));
+
+            foreach (UIElement control in UploadControls)
+            {
+                Image thumbnail = (Image)control;
+                thumbnail.Source = source;
+            }
+        }
+
+        void UpdateUploadComplete(string UID, string Url)
+        {
+            var UploadControls = GetVisuals(rtf_output.Document).OfType<Control>().Where(control => ((Control)control).Name.StartsWith("upload_" + UID + "_"));
+
+            var UploadControls1 = GetVisuals(rtf_output.Document).OfType<Grid>().Where(control => ((Grid)control).Name.StartsWith("upload_" + UID + "_"));
+
+            foreach (Grid control in UploadControls1)
+            {
+                if (control.Name.EndsWith("_control"))
+                {
+                    control.Cursor = Cursors.Hand;
+                    control.Tag = Url;
+
+                    LinkAllUploads();
+
+                    
+                }
+            }
+
+            foreach (Control control in UploadControls)
+            {
+                if (control.Name.EndsWith("_progress"))
+                {
+                    ProgressBar progressbar = control as ProgressBar;
+                    progressbar.Visibility = System.Windows.Visibility.Hidden;
+                }
+
+                if (control.Name.EndsWith("_progresstxt"))
+                {
+                    Label progresstext = control as Label;
+                    progresstext.Content = Url;
+                }
+            }
+        }
+
+        void UpdateUploadProgress(string UID, int Percent)
+        {
+            var UploadControls = GetVisuals(rtf_output.Document).OfType<Control>().Where(control => ((Control)control).Name.StartsWith("upload_" + UID + "_"));
+
+            foreach (Control control in UploadControls)
+            {
+                if (control.Name.EndsWith("_progress"))
+                {
+                    ProgressBar progressbar = control as ProgressBar;
+
+                    progressbar.Minimum = 0;
+                    progressbar.Maximum = 100;
+                    progressbar.Value = Percent;
+                }
+
+                if (control.Name.EndsWith("_progresstxt"))
+                {
+                    Label progresstext = control as Label;
+                    if (Percent >= 100)
+                        progresstext.Content = string.Format("Uploading ({0}%)...", 100);
+                    else
+                        progresstext.Content = string.Format("Uploading ({0}%)...", Percent);
+                }
+            }
         }
 
         void link_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
@@ -281,6 +464,91 @@ namespace BlazeGames.IM.Client
         {
             SlideFade.CancelProfileImgAnimation2();
             
+        }
+
+        private void rtf_DragDrop(object s, DragEventArgs ev)
+        {
+            if (ev.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] docPath = (string[])ev.Data.GetData(DataFormats.FileDrop);
+                foreach (string file in docPath)
+                {
+                    FileInfo fi = new FileInfo(file);
+                    if(!fi.Exists)
+                        continue;
+
+                    string icon = "http://blaze-games.com/files/icon/file-" + fi.Name + "/";
+
+                    string UID = Guid.NewGuid().ToString().Replace("-", "");
+                    int lastprogress = 0;
+                    byte[] filedata = BlazeGames.IM.Client.Core.Utilities.Compress(File.ReadAllBytes(fi.FullName));
+
+                    HandleMessage(App.NickName, @"<Span xmlns=""default"">
+<Grid Name=""upload_" + UID + @"_control"" Background=""Transparent"" Width=""400"" Height=""100"">
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width=""100""/>
+        <ColumnDefinition Width=""*""/>
+    </Grid.ColumnDefinitions>
+    <ProgressBar Name=""upload_" + UID + @"_progress"" HorizontalAlignment=""Stretch"" Height=""20"" Margin=""15,42,15,15"" VerticalAlignment=""Center"" Grid.Column=""1""/>
+    <Image Name=""upload_" + UID + @"_thumbnail"" Grid.Column=""0"" HorizontalAlignment=""Stretch"" Margin=""15"" VerticalAlignment=""Stretch""/>
+    <Label Name=""upload_" + UID + @"_filename"" Content=""" + fi.Name + @""" Grid.Column=""1"" Margin=""15,15,15,40"" VerticalAlignment=""Center"" FontSize=""18"" Foreground=""#FF363636""  />
+    <Label Name=""upload_" + UID + @"_progresstxt"" Content=""Uploading (0%)..."" Grid.Column=""1"" Margin=""15,42,15,15"" VerticalAlignment=""Center"" FontSize=""14"" Foreground=""#FF5F5F5F""  />
+</Grid>
+<LineBreak />
+</Span>");
+                    UpdateUploadThumbnail(UID, new System.Windows.Media.Imaging.BitmapImage(new Uri(icon)));
+
+                    using (WebClient wc = new WebClient())
+                    {
+                        wc.UploadDataCompleted += (sender, e) =>
+                        {
+                            string Url = Encoding.Default.GetString(e.Result);
+                            UpdateUploadComplete(UID, Url);
+
+                            ChattingWith.SendMessage(@"<Span xmlns=""default"">
+<Grid Name=""upload_" + UID + @"_control"" Cursor=""Hand"" Background=""Transparent"" Width=""400"" Height=""100"" Tag=""" + Url + @""">
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width=""100""/>
+        <ColumnDefinition Width=""*""/>
+    </Grid.ColumnDefinitions>
+    <Image Name=""upload_" + UID + @"_thumbnail"" Grid.Column=""0"" HorizontalAlignment=""Stretch"" Margin=""15"" VerticalAlignment=""Stretch"" Source=""" + icon + @"""/>
+    <Label Name=""upload_" + UID + @"_filename"" Content=""" + fi.Name + @""" Grid.Column=""1"" Margin=""15,15,15,40"" VerticalAlignment=""Center"" FontSize=""18"" Foreground=""#FF363636""  />
+    <Label Name=""upload_" + UID + @"_progresstxt"" Content=""" + Url + @""" Grid.Column=""1"" Margin=""15,42,15,15"" VerticalAlignment=""Center"" FontSize=""14"" Foreground=""#FF5F5F5F""  />
+</Grid>
+<LineBreak />
+</Span>");
+                        };
+
+                        wc.UploadProgressChanged += (sender, e) =>
+                        {
+
+                            if (lastprogress != e.ProgressPercentage)
+                            {
+                                UpdateUploadProgress(UID, (e.ProgressPercentage * 2) - 1);
+                            }
+
+                            lastprogress = e.ProgressPercentage;
+                        };
+
+                        wc.UploadDataAsync(new Uri("http://blaze-games.com/files/upload/&file_name=" + fi.Name), filedata);
+                    }
+                }
+            }
+
+            ev.Handled = false;
+        }
+
+        private void rtf_DragOver(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effects = DragDropEffects.All;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+            }
+            e.Handled = false;
         }
     }
 }

@@ -18,6 +18,9 @@
       <VisualElements DisplayName="Blaze IM" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="BlazeGames.IM.Client.RT" ForegroundText="light" BackgroundColor="#119EDA">
         <DefaultTile ShowName="allLogos" />
         <SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#119EDA" />
+        <InitialRotationPreference>
+          <Rotation Preference="landscape" />
+        </InitialRotationPreference>
       </VisualElements>
     </Application>
   </Applications>

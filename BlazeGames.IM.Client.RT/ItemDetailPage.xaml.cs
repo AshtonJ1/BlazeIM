@@ -50,7 +50,8 @@ namespace BlazeGames.IM.Client.RT
             var item = SampleDataSource.GetItem((String)navigationParameter);
             this.DefaultViewModel["Group"] = item.Group;
             this.DefaultViewModel["Items"] = item.Group.Items;
-            this.flipView.SelectedItem = item;
+            this.img.Source = item.Image;
+            this.pageTitle.Text = item.Title;
         }
 
         /// <summary>
@@ -61,8 +62,7 @@ namespace BlazeGames.IM.Client.RT
         /// <param name="pageState">An empty dictionary to be populated with serializable state.</param>
         protected override void SaveState(Dictionary<String, Object> pageState)
         {
-            var selectedItem = (DataItem)this.flipView.SelectedItem;
-            pageState["SelectedItem"] = selectedItem.UniqueId;
+            
         }
     }
 }
