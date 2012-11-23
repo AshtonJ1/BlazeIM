@@ -44,6 +44,9 @@ namespace BlazeGames.IM.Server
                     case Packets.PAK_CLI_FRNDDNYRQST: PacketHandlers.HandleFriendDenyRequest(socketConnection, pak); break;
                     case Packets.PAK_CLI_CHNGUPDTRQST: PacketHandlers.HandleChangeUpdateRequest(socketConnection, pak); break;
                     case Packets.PAK_CLI_FRNDRMVRQST: PacketHandlers.HandleFriendRemoveRequest(socketConnection, pak); break;
+                    case Packets.PAK_CLI_CALL_RQST: PacketHandlers.HandleCallRequest(socketConnection, pak); break;
+                    case Packets.PAK_CLI_CALL_ACC: PacketHandlers.HandleCallAccept(socketConnection, pak); break;
+                    case Packets.PAK_CLI_CALL_DNY: PacketHandlers.HandleCallDeny(socketConnection, pak); break;
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Invalid packet from {0}, 0x{1:X}", socketConnection.IP, Header);

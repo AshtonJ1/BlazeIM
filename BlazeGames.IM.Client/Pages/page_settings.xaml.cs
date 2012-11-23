@@ -102,6 +102,7 @@ namespace BlazeGames.IM.Client
                 MainWindow.Instance.Resources["AccentColor"] = brush;
                 MainWindow.Instance.page_Login.Resources["AccentColor"] = brush;
                 MainWindow.Instance.page_Contacts.Resources["AccentColor"] = brush;
+                MainWindow.Instance.AddFriendWindow.Resources["AccentColor"] = brush;
                 this.Resources["AccentColor"] = e.NewValue;
             }
             catch (Exception ex) {Console.WriteLine(ex.ToString()); }

@@ -67,6 +67,21 @@ Stack Trace
             }
         }
 
+        public static string GetLocalAddress()
+        {
+            string Address = "";
+
+            IPHostEntry host;
+            host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (IPAddress ip in host.AddressList)
+            {
+                if (ip.AddressFamily.ToString() == "InterNetwork")
+                    Address = ip.ToString();
+            }
+
+            return Address;
+        }
+
         #region Compression
         public static byte[] Decompress(byte[] zippedData)
         {

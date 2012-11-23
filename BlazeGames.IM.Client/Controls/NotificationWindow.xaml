@@ -6,6 +6,12 @@
         <Canvas Width="48" Height="48" Clip="F1 M 0,0L 48,0L 48,48L 0,48L 0,0" x:Key="appbar_close">
             <Path Width="20" Height="20" Canvas.Left="14" Canvas.Top="14" Stretch="Fill" Fill="White" Data="F1 M 17,14L 24,21L 30.9999,14.0001L 33.9999,17.0001L 27,24L 33.9999,31L 31,34L 24,27L 17,34L 14,31L 21,24L 14,17L 17,14 Z " />
         </Canvas>
+        <Canvas Width="48" Height="48" Clip="F1 M 0,0L 48,0L 48,48L 0,48L 0,0" UseLayoutRounding="False" x:Key="appbar_phone_red">
+            <Path Width="18.653" Height="26.6725" Canvas.Left="15.8996" Canvas.Top="10.8071" Stretch="Fill" Fill="Red" Data="F1 M 18.4061,11.5099C 19.6792,10.833 20.9357,10.5303 22.3639,11.1256L 24.3127,16.2973L 22.796,17.1038C 20.8455,18.1409 20.105,20.5629 21.1421,22.5134L 24.4284,28.6941C 25.4656,30.6446 27.8875,31.3851 29.8381,30.348L 31.3548,29.5415L 34.5525,34.0491C 34.2474,35.566 33.2938,36.4384 32.0207,37.1154C 28.8511,38.8007 22.1123,34.4558 18.5913,27.8337C 14.8317,20.7629 15.2364,13.1952 18.4061,11.5099 Z " />
+        </Canvas>
+        <Canvas Width="48" Height="48" Clip="F1 M 0,0L 48,0L 48,48L 0,48L 0,0" UseLayoutRounding="False" x:Key="appbar_phone_green">
+            <Path Width="18.653" Height="26.6725" Canvas.Left="15.8996" Canvas.Top="10.8071" Stretch="Fill" Fill="Green" Data="F1 M 18.4061,11.5099C 19.6792,10.833 20.9357,10.5303 22.3639,11.1256L 24.3127,16.2973L 22.796,17.1038C 20.8455,18.1409 20.105,20.5629 21.1421,22.5134L 24.4284,28.6941C 25.4656,30.6446 27.8875,31.3851 29.8381,30.348L 31.3548,29.5415L 34.5525,34.0491C 34.2474,35.566 33.2938,36.4384 32.0207,37.1154C 28.8511,38.8007 22.1123,34.4558 18.5913,27.8337C 14.8317,20.7629 15.2364,13.1952 18.4061,11.5099 Z " />
+        </Canvas>
     </Window.Resources>
     <Border BorderBrush="White" BorderThickness="3" HorizontalAlignment="Stretch" Margin="10" Name="border1" VerticalAlignment="Stretch" CornerRadius="5">
         <Border.Background>
@@ -19,6 +25,12 @@
                 <RowDefinition Height="25" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
+            <Border Grid.Row="1" x:Name="profile_image" BorderBrush="#FF00AE20" HorizontalAlignment="Center" Height="45" VerticalAlignment="Center" Width="45" Margin="0" Visibility="Collapsed">
+                <Border.Background>
+                    <ImageBrush x:Name="profile_image_source" ImageSource="https://blaze-games.com/api/image/nocompress/?nickname="/>
+                </Border.Background>
+            </Border>
+            
             <Button x:Name="btn_close" Width="13" Height="13" VerticalAlignment="Top" HorizontalAlignment="Right" Cursor="Hand" IsDefault="True" Foreground="White" BorderBrush="White" Margin="5" MinHeight="0" Click="btn_close_Click">
                 <Button.Template>
                     <ControlTemplate TargetType="{x:Type Button}">
@@ -32,6 +44,30 @@
             </Button>
             <Label Content="Notification Title" HorizontalAlignment="Left" Margin="5,5,0,0" Padding="0" Name="txt_notificationtitle" VerticalAlignment="Top" Foreground="#FFDBDBDB" FontWeight="Bold" />
             <TextBlock Grid.Row="1" HorizontalAlignment="Stretch" Margin="5,3,0,0" Name="txt_notificationcontent" Text="This is a notification content block." Padding="0" Foreground="White" VerticalAlignment="Stretch" TextWrapping="Wrap" />
+
+            <Button x:Name="btn_call_accept" Visibility="Collapsed" Grid.Row="1" Width="25" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Right" Cursor="Hand" IsDefault="True" Foreground="White" BorderBrush="White" Margin="10" MinHeight="0" Click="btn_call_accept_Click">
+                <Button.Template>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Rectangle>
+                            <Rectangle.Fill>
+                                <VisualBrush Visual="{DynamicResource appbar_phone_green}" />
+                            </Rectangle.Fill>
+                        </Rectangle>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+
+            <Button x:Name="btn_call_deny" Visibility="Collapsed" Grid.Row="1" Width="25" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Left" Cursor="Hand" IsDefault="True" Foreground="White" BorderBrush="White" Margin="10" MinHeight="0" Click="btn_call_deny_Click">
+                <Button.Template>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Rectangle>
+                            <Rectangle.Fill>
+                                <VisualBrush Visual="{DynamicResource appbar_phone_red}" />
+                            </Rectangle.Fill>
+                        </Rectangle>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
         </Grid>
     </Border>
 </Window>

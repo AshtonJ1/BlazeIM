@@ -1,0 +1,6 @@
+﻿<Window x:Class="BlazeGames.IM.Client.ConsoleWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ConsoleWindow" Height="325" Width="550" x:ClassModifier="internal" Closing="Window_Closing_1">
+    <TextBlock Name="txt_console" TextWrapping="Wrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Black" Foreground="Lime" Padding="10" FontSize="14" FontFamily="Consolas" />
+</Window>

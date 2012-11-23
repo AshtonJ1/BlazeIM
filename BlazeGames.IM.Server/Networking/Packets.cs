@@ -25,9 +25,15 @@ namespace BlazeGames.IM.Server.Networking
             PAK_CLI_FRNDRMVRQST     = 0x13,     //  FriendRemoveRequest(ID)            
             PAK_CLI_OFFLNMSGRQST    = 0x14,     //  OfflineMessageRequest()
 
-            PAK_CLI_GRP_INV         = 0x15,     //  GroupInviteRequest(GroupID, MemID)              *
-            PAK_CLI_GRP_LEAVE       = 0x16,     //  GroupLeave(GroupID)                             *
-            PAK_CLI_GRP_SNDMSG      = 0x17,     //  GroupSendMessage(GroupID, Message)              *
+            //PAK_CLI_GRP_INV         = 0x15,     //  GroupInviteRequest(GroupID, MemID)              *
+            //PAK_CLI_GRP_LEAVE       = 0x16,     //  GroupLeave(GroupID)                             *
+            //PAK_CLI_GRP_SNDMSG      = 0x17,     //  GroupSendMessage(GroupID, Message)              *
+
+            PAK_CLI_CALL_RQST       = 0x18,     //  CallRequest(MemberID)                           *
+            PAK_CLI_CALL_CNCL       = 0x19,     //  CallCancel(MemberID)                            *
+            PAK_CLI_CALL_ACC        = 0x20,     //  CallAccept(MemberID)                            *
+            PAK_CLI_CALL_DNY        = 0x21,     //  CallDeny(MemberID)                              *
+            PAK_CLI_CALL_END        = 0x22,     //  CallEnd(MemberID)                               *
 
             // PAK_SRV
             PAK_SRV_LGNRESP         = 0x51,     //  LoginResponse(ResponseCode, ID, Nickname, Status)
@@ -40,9 +46,15 @@ namespace BlazeGames.IM.Server.Networking
             PAK_SRV_NEWUPDTDLVR     = 0x59,     //  NewUpdateDeliver(ID, NewUpdate)
             PAK_SRV_FRNDRMVDLVR     = 0x61,     //  FriendRemoveDeliver(ID)
 
-            PAK_SRV_GRP_MSGDLVR     = 0x62,     //  GroupMessageDelver(GroupID, FromID, Message)    *
-            PAK_SRV_GRP_JOINDLVR    = 0x63,     //  GroupJoinDeliver(GroupID, MemID)                *
-            PAK_SRV_GRP_LEAVDLVR    = 0x64;     //  GroupLeaveDeliver(GroupID, MemID)               *
+            //PAK_SRV_GRP_MSGDLVR     = 0x62,     //  GroupMessageDelver(GroupID, FromID, Message)    *
+            //PAK_SRV_GRP_JOINDLVR    = 0x63,     //  GroupJoinDeliver(GroupID, MemID)                *
+            //PAK_SRV_GRP_LEAVDLVR    = 0x64,     //  GroupLeaveDeliver(GroupID, MemID)               *
+
+            PAK_SRV_CALL_DLVR       = 0x65,     //  CallDeliver(MemberID, UDPAddress)               *
+            PAK_SRV_CALL_CNCL_DLVR  = 0x66,     //  CallCancelDeliver(MemberID)                     *
+            PAK_SRV_CALL_ACC_DLVR   = 0x67,     //  CallAcceptDeliver(MemberID, UDPAddress)         *
+            PAK_SRV_CALL_DNY_DLVR   = 0x68,     //  CallDenyDeliver(MemberID)                       *
+            PAK_SRV_CALL_END_DLVR   = 0x69;     //  CallEndDeliver(MemberID)                        *
     }
 
     class PacketHandlers
@@ -396,6 +408,93 @@ namespace BlazeGames.IM.Server.Networking
                 if (ServerSocket.Instance.MemberConnections.ContainsKey(MemberID))
                     ServerSocket.Instance.MemberConnections[MemberID].SendPacket(Packet.New(Packets.PAK_SRV_FRNDRMVDLVR, member1.ID));
                 conn.SendPacket(Packet.New(Packets.PAK_SRV_FRNDRMVDLVR, member2.ID));
+            }
+        }
+
+        public static void HandleCallRequest(SocketConnection conn, Packet pak)
+        {
+            if (conn.ConnectionData.ContainsKey("Member"))
+            {
+                Member memfrom = (Member)conn.ConnectionData["Member"];
+                int MemberCall = pak.Readint();
+                int Port = pak.Readint();
+                string LocalAddress = pak.Readstring();
+
+                if (memfrom.Friends.Contains(Convert.ToString(MemberCall)))
+                {
+                    if (ServerSocket.Instance.MemberConnections.ContainsKey(MemberCall))
+                    {
+                        SocketConnection toconn = ServerSocket.Instance.MemberConnections[MemberCall];
+                        if(conn.clientSocket.RemoteEndPoint.ToString().Split(':')[0] == toconn.clientSocket.RemoteEndPoint.ToString().Split(':')[0])
+                            toconn.SendPacket(Packet.New(Packets.PAK_SRV_CALL_DLVR, memfrom.ID, LocalAddress, Port));
+                        else
+                            toconn.SendPacket(Packet.New(Packets.PAK_SRV_CALL_DLVR, memfrom.ID, conn.clientSocket.RemoteEndPoint.ToString().Split(':')[0], Port));
+                    }
+                    else
+                    {
+                        //TODO: Notify the member that the friend is offline
+                    }
+                }
+                else
+                {
+                    //TODO: Notify the member that the friend is not in their list
+                }
+            }
+        }
+
+        public static void HandleCallAccept(SocketConnection conn, Packet pak)
+        {
+            if (conn.ConnectionData.ContainsKey("Member"))
+            {
+                Member memfrom = (Member)conn.ConnectionData["Member"];
+                int MemberCall = pak.Readint();
+                int Port = pak.Readint();
+                string LocalAddress = pak.Readstring();
+
+                if (memfrom.Friends.Contains(Convert.ToString(MemberCall)))
+                {
+                    if (ServerSocket.Instance.MemberConnections.ContainsKey(MemberCall))
+                    {
+                        SocketConnection toconn = ServerSocket.Instance.MemberConnections[MemberCall];
+                        if (conn.clientSocket.RemoteEndPoint.ToString().Split(':')[0] == toconn.clientSocket.RemoteEndPoint.ToString().Split(':')[0])
+                            toconn.SendPacket(Packet.New(Packets.PAK_SRV_CALL_ACC_DLVR, memfrom.ID, LocalAddress, Port));
+                        else
+                            toconn.SendPacket(Packet.New(Packets.PAK_SRV_CALL_ACC_DLVR, memfrom.ID, conn.clientSocket.RemoteEndPoint.ToString().Split(':')[0], Port));
+                    }
+                    else
+                    {
+                        //TODO: Notify the member that the friend is offline
+                    }
+                }
+                else
+                {
+                    //TODO: Notify the member that the friend is not in their list
+                }
+            }
+        }
+
+        public static void HandleCallDeny(SocketConnection conn, Packet pak)
+        {
+            if (conn.ConnectionData.ContainsKey("Member"))
+            {
+                Member memfrom = (Member)conn.ConnectionData["Member"];
+                int MemberCall = pak.Readint();
+
+                if (memfrom.Friends.Contains(Convert.ToString(MemberCall)))
+                {
+                    if (ServerSocket.Instance.MemberConnections.ContainsKey(MemberCall))
+                    {
+                        ServerSocket.Instance.MemberConnections[MemberCall].SendPacket(Packet.New(Packets.PAK_SRV_CALL_DNY_DLVR, memfrom.ID));
+                    }
+                    else
+                    {
+                        //TODO: Notify the member that the friend is offline
+                    }
+                }
+                else
+                {
+                    //TODO: Notify the member that the friend is not in their list
+                }
             }
         }
     }

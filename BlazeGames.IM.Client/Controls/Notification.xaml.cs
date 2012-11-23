@@ -20,7 +20,7 @@ namespace BlazeGames.IM.Client
     /// </summary>
     internal partial class Notification : Window
     {
-        static Notification Instance;
+        //static Notification Instance;
 
         private List<NotificationMessage> Notifications = new List<NotificationMessage>();
 

@@ -17,6 +17,10 @@ using BlazeGames.IM.Client.Networking;
 using System.Media;
 using System.Threading;
 using System.Diagnostics;
+using NAudio.CoreAudioApi;
+using NAudio.Wave;
+using System.Runtime.InteropServices;
+using Audio.Codecs;
 
 namespace BlazeGames.IM.Client
 {
@@ -26,6 +30,8 @@ namespace BlazeGames.IM.Client
     internal partial class App : Application
     {
         public static App Instance { get; private set; }
+
+        public VoiceCallCore VCallCore;
 
         public Dictionary<int, Contact> Contacts = new Dictionary<int, Contact>();
         public List<Contact> OpenChats = new List<Contact>();
@@ -50,6 +56,20 @@ namespace BlazeGames.IM.Client
 
         public App()
         {
+            /*if (ApplicationRunningHelper.AlreadyRunning())
+            {
+                Application.Current.Shutdown();
+                return;
+            }*/  
+
+            if (ConfigManager.Instance.GetBool("indev", false))
+            {
+                ConsoleWindow consolewnd = new ConsoleWindow();
+                ConsoleLog log = new ConsoleLog(Console.Out);
+                Console.SetOut(log);
+                consolewnd.Show();
+            }
+
             ApplicationStartTick = Environment.TickCount & Int32.MaxValue;
 
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
@@ -59,7 +79,12 @@ namespace BlazeGames.IM.Client
             DirectoryInfo chatlogs_di = new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BlazeGamesIM", "ChatLogs"));
             if (!chatlogs_di.Exists)
                 chatlogs_di.Create();
-            //Plugins.PluginsManager.Instance.LoadPluginsFromFolder();
+
+            FileInfo opuscodec_fi = new FileInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BlazeGamesIM", "Codecs", "opus.dll"));
+            if (!opuscodec_fi.Directory.Exists)
+                opuscodec_fi.Directory.Create();
+            if (!opuscodec_fi.Exists)
+                File.WriteAllBytes(opuscodec_fi.FullName, BlazeGames.IM.Client.Properties.Resources.opus);
 
             try
             {
@@ -104,6 +129,8 @@ namespace BlazeGames.IM.Client
         static Assembly mahapps = Assembly.Load(BlazeGames.IM.Client.Properties.Resources.MahApps_Metro);
         static Assembly interactivity = Assembly.Load(BlazeGames.IM.Client.Properties.Resources.System_Windows_Interactivity);
         static Assembly fluidkit = Assembly.Load(BlazeGames.IM.Client.Properties.Resources.FluidKit);
+        static Assembly naudio = Assembly.Load(BlazeGames.IM.Client.Properties.Resources.NAudio);
+        static Assembly opuswrapper = Assembly.Load(BlazeGames.IM.Client.Properties.Resources.OpusWrapper);
 
         static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
@@ -116,6 +143,8 @@ namespace BlazeGames.IM.Client
                 case "wpftoolkit.extended": return toolkit;
                 case "system.windows.interactivity": return interactivity;
                 case "fluidkit": return fluidkit;
+                case "naudio": return naudio;
+                case "opuswrapper": return opuswrapper;
                 default:
                     Console.WriteLine("Failed To Load: {0}", args.Name);
                     return null;
@@ -294,7 +323,10 @@ namespace BlazeGames.IM.Client
                 if (contact.status == Status.Offline && NewStatus != Status.Offline && ConfigManager.Instance.GetBool("txt_loginnotification", true) && ConfigManager.Instance.GetBool("txt_notifications", true))
                     NotificationWindow.ShowNotification(String.Format("{0} Has Signed In", contact.NickName), String.Format("{0} has just signed in.", contact.NickName), contact);
                 if (contact.status != Status.Offline && NewStatus == Status.Offline && ConfigManager.Instance.GetBool("txt_logoutnotification", true) && ConfigManager.Instance.GetBool("txt_notifications", true))
+                {
+                    VCallCore.EndCall(contact.ID);
                     NotificationWindow.ShowNotification(String.Format("{0} Has Signed Out", contact.NickName), String.Format("{0} has just signed out.", contact.NickName), contact);
+                }
 
                 contact.status = NewStatus;
                 BlazeGames.IM.Client.MainWindow.Instance.page_Contacts.Draw();
@@ -326,8 +358,50 @@ namespace BlazeGames.IM.Client
             }, null);
         }
 
+        void HandleCallRequest(ClientSocket clientsocket, Packet pak)
+        {
+            this.Dispatcher.Invoke((MethodInvoker)delegate
+            {
+                int MemberID = pak.Readint();
+                Contact contact = Contacts[MemberID];
+                string UDPAddress = pak.Readstring();
+                int Port = pak.Readint();
+
+                NotificationWindow.ShowCallNotification(contact, UDPAddress, Port);
+            }, null);
+        }
+
+        void HandleCallAcceptRequest(ClientSocket clientsocket, Packet pak)
+        {
+            this.Dispatcher.Invoke((MethodInvoker)delegate
+            {
+                int MemberID = pak.Readint();
+                string UDPAddress = pak.Readstring();
+                int Port = pak.Readint();
+
+                VCallCore.StartCall(MemberID, new IPEndPoint(IPAddress.Parse(UDPAddress), Port));
+                SoundManager.VoiceCallingSound.Stop();
+
+            }, null);
+        }
+
+        void HandleCallDenyRequest(ClientSocket clientsocket, Packet pak)
+        {
+            this.Dispatcher.Invoke((MethodInvoker)delegate
+            {
+                int MemberID = pak.Readint();
+                Contact contact = Contacts[MemberID];
+                contact.CallActive = false;
+                VCallCore.EndCall(MemberID);
+                SoundManager.VoiceCallingSound.Stop();
+                NotificationWindow.RemoveCallNotification(contact);
+            }, null);
+        }
+
         void App_Startup(object sender, StartupEventArgs e)
         {
+            VCallCore = new VoiceCallCore();
+
             Application.Current.DispatcherUnhandledException += new System.Windows.Threading.DispatcherUnhandledExceptionEventHandler(Current_DispatcherUnhandledException);
 
             int StartupTick = Environment.TickCount & Int32.MaxValue;
@@ -439,6 +513,9 @@ namespace BlazeGames.IM.Client
                     case Packets.PAK_SRV_NEWSTSDLVR: this.HandleStatusChangeDeliver(clientSocket, pak); break;
                     case Packets.PAK_SRV_NEWUPDTDLVR: this.HandleUpdateChangeDeliver(clientSocket, pak); break;
                     case Packets.PAK_SRV_FRNDRMVDLVR: this.HandleFriendRemoveDeliver(clientSocket, pak); break;
+                    case Packets.PAK_SRV_CALL_DLVR: this.HandleCallRequest(clientSocket, pak); break;
+                    case Packets.PAK_SRV_CALL_ACC_DLVR: this.HandleCallAcceptRequest(clientSocket, pak); break;
+                    case Packets.PAK_SRV_CALL_DNY_DLVR: this.HandleCallDenyRequest(clientSocket, pak); break;
                     default: break;
                 }
             }
@@ -550,7 +627,7 @@ namespace BlazeGames.IM.Client
             this.NewMessages = NewMessages;
             this.LastMessage = DateTime.Now;
             this.Pending = Pending;
-
+            this.CallActive = false;
 
             if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BlazeGamesIM", "ChatLogs", NickName + ".xml")))
                 doc.Load(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BlazeGamesIM", "ChatLogs", NickName + ".xml"));
@@ -594,14 +671,22 @@ namespace BlazeGames.IM.Client
         private int _NewMessages;
 
         public int Authority,
-            ID;
+            _ID;
 
-        private bool _Pending;
+        private bool _Pending,
+            _CallActive;
 
         private Status _status;
 
         private DateTime _LastMessage;
 
+        private Visibility _VCallBtnVisibility,
+            _VEndBtnVisibility;
+
+        /// <summary>
+        /// Gets and sets the contact ID
+        /// </summary>
+        public int ID { get { return _ID; } set { _ID = value; OnPropertyChanged("ID"); } }
         /// <summary>
         /// Gets and sets the contacts nickname
         /// </summary>
@@ -651,7 +736,7 @@ namespace BlazeGames.IM.Client
         /// <summary>
         /// Gets and sets the contacts status
         /// </summary>
-        public Status status { get { return _status; } set { _status = value; BorderColor = value.GetColor(); OnPropertyChanged("status"); } }
+        public Status status { get { return _status; } set { if (value == Status.Offline) { CallActive = false; } else { if (!CallActive) { VCallBtnVisibility = Visibility.Visible; VEndBtnVisibility = Visibility.Collapsed; } } _status = value; BorderColor = value.GetColor(); OnPropertyChanged("status"); } }
         /// <summary>
         /// Gets the contacts "status" border color
         /// </summary>
@@ -668,6 +753,40 @@ namespace BlazeGames.IM.Client
                         MainWindow.Instance.page_Chat.profile_image.BorderBrush = (System.Windows.Media.SolidColorBrush)new System.Windows.Media.BrushConverter().ConvertFromString(value);
             }
         }
+        public bool CallActive
+        {
+            get { return _CallActive; }
+            set
+            {
+                if (status != Status.Offline)
+                {
+                    if (value)
+                    {
+                        VCallBtnVisibility = Visibility.Collapsed;
+                        VEndBtnVisibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        VCallBtnVisibility = Visibility.Visible;
+                        VEndBtnVisibility = Visibility.Collapsed;
+                    }
+                }
+                else
+                {
+                    VCallBtnVisibility = Visibility.Collapsed;
+                    VEndBtnVisibility = Visibility.Collapsed;
+                }
+                _CallActive = value;
+            }
+        }
+        /// <summary>
+        /// Gets and sets the start voice call button visibility
+        /// </summary>
+        public Visibility VCallBtnVisibility { get { return _VCallBtnVisibility; } set { _VCallBtnVisibility = value; OnPropertyChanged("VCallBtnVisibility"); } }
+        /// <summary>
+        /// Gets and sets the end voice call button visibility
+        /// </summary>
+        public Visibility VEndBtnVisibility { get { return _VEndBtnVisibility; } set { _VEndBtnVisibility = value; OnPropertyChanged("VEndBtnVisibility"); } }
         /// <summary>
         /// Gets and sets the last message date for sorting
         /// </summary>
@@ -694,7 +813,7 @@ namespace BlazeGames.IM.Client
             if (!App.Instance.OpenChats.Contains(this))
                 App.Instance.OpenChats.Add(this);
 
-            if (MainWindow.Instance.WindowState == WindowState.Minimized) { NotifyNewMessage(Message); }
+            if (!MainWindow.Instance.IsFocused) { NotifyNewMessage(Message); }
             else if (MainWindow.Instance.Minimum) { NotifyNewMessage(Message); }
             else if (BlazeGames.IM.Client.MainWindow.Instance.CurrentPage != "chat") { NotifyNewMessage(Message); }
             else if (BlazeGames.IM.Client.MainWindow.Instance.page_Chat.ChattingWith == null) { NotifyNewMessage(Message); }
@@ -714,7 +833,7 @@ namespace BlazeGames.IM.Client
             {
                 NewMessages++;
                 if (ConfigManager.Instance.GetBool("sound_notifications", true) && ConfigManager.Instance.GetBool("sound_newmessagenotification", true))
-                    new SoundPlayer(Properties.Resources.new_message_bells).Play();
+                    SoundManager.NewMessageSound.Play();
 
                 if (ConfigManager.Instance.GetBool("txt_notifications", true) && ConfigManager.Instance.GetBool("txt_newmessagenotification", true))
                 {
@@ -794,5 +913,65 @@ namespace BlazeGames.IM.Client
         public bool Read;
 
         public DateTime SendTime;
+    }
+
+    internal static class ApplicationRunningHelper
+    {
+        [DllImport("user32.dll")]
+        private static extern
+            bool SetForegroundWindow(IntPtr hWnd);
+        [DllImport("user32.dll")]
+        private static extern
+            bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
+        [DllImport("user32.dll")]
+        private static extern
+            bool IsIconic(IntPtr hWnd);
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary> check if current process already running. if running, set focus to existing process and 
+        ///           returns <see langword="true"/> otherwise returns <see langword="false"/>. </summary>
+        /// <returns> <see langword="true"/> if it succeeds, <see langword="false"/> if it fails. </returns>
+        /// -------------------------------------------------------------------------------------------------
+        public static bool AlreadyRunning()
+        {
+            /*
+            const int SW_HIDE = 0;
+            const int SW_SHOWNORMAL = 1;
+            const int SW_SHOWMINIMIZED = 2;
+            const int SW_SHOWMAXIMIZED = 3;
+            const int SW_SHOWNOACTIVATE = 4;
+            const int SW_RESTORE = 9;
+            const int SW_SHOWDEFAULT = 10;
+            */
+            const int swRestore = 9;
+
+            var me = Process.GetCurrentProcess();
+            var arrProcesses = Process.GetProcessesByName(me.ProcessName);
+
+            if (arrProcesses.Length > 1)
+            {
+                for (var i = 0; i < arrProcesses.Length; i++)
+                {
+                    if (arrProcesses[i].Id != me.Id)
+                    {
+                        // get the window handle
+                        IntPtr hWnd = arrProcesses[i].MainWindowHandle;
+
+                        // if iconic, we need to restore the window
+                        if (IsIconic(hWnd))
+                        {
+                            ShowWindowAsync(hWnd, swRestore);
+                        }
+
+                        // bring it to the foreground
+                        SetForegroundWindow(hWnd);
+                        break;
+                    }
+                }
+                return true;
+            }
+
+            return false;
+        }
     }
 }

@@ -114,5 +114,15 @@ namespace BlazeGames.IM.Client
                 }
             }
         }
+
+        private void btn_voicecall_Click(object sender, RoutedEventArgs e)
+        {
+            if (contact.status != Status.Offline)
+            {
+                App.Instance.CSocket.SendPacket(Packet.New(Packets.PAK_CLI_CALL_RQST, contact.ID, App.Instance.VCallCore.UDPPort, BlazeGames.IM.Client.Core.Utilities.GetLocalAddress()));
+                SoundManager.VoiceCallingSound.PlayLooping();
+                contact.CallActive = true;
+            }
+        }
     }
 }

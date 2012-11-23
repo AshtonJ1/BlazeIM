@@ -325,17 +325,48 @@ namespace BlazeGames.IM.Client
             {
                 if (control.Tag != null)
                 {
-                    string Url = control.Tag as string;
-                    control.PreviewMouseDown += (sender, e) =>
-                        {
-                            try
-                            {
-                                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(Url));
-                            }
-                            catch { }
-                        };
+                    control.PreviewMouseDown += control_PreviewMouseDown;
                 }
             }
+        }
+
+        void control_PreviewMouseDown(object sender1, MouseButtonEventArgs e1)
+        {
+            try
+            {
+                Grid control = sender1 as Grid;
+                string Tag = control.Tag as string;
+                /*string[] Tags = Tag.Split('\t');
+
+                if (Tags[0] == "downloaded")
+                {
+                    //Open the file
+                    Process.Start(new ProcessStartInfo(Tags[1]));
+                }
+                else if (Tags[0] == "waiting")
+                {
+                    // Download The File
+                    control.Tag = "downloading\t" + Tags[1];
+
+                    using (WebClient wc = new WebClient())
+                    {
+                        wc.DownloadProgressChanged += (sender, e) =>
+                            {
+                                
+                            };
+
+                        wc.DownloadFileCompleted += (sender, e) =>
+                            {
+
+                            };
+                    }
+                }*/
+
+                
+                Process.Start(new ProcessStartInfo(Tag));
+                e1.Handled = true;
+            }
+            catch { }
         }
 
         void UpdateUploadThumbnail(string UID, ImageSource source)
@@ -430,11 +461,7 @@ namespace BlazeGames.IM.Client
             }
         }
 
-        void hlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
-        {
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(e.Uri.AbsoluteUri));
-            e.Handled = true;
-        }
+        
 
         void Input_Return_Execute(object target, ExecutedRoutedEventArgs e)
         {

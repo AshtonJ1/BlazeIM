@@ -628,6 +628,12 @@ namespace BlazeGames.IM.Client
         private void wnd_Closing(object sender, CancelEventArgs e)
         {
             NotificationWindow.ForceClose();
+
+            try
+            {
+                ConsoleWindow.Instance.Close();
+            }
+            catch { }
         }
 
         private void bar_Loaded(object sender, RoutedEventArgs e)
@@ -678,6 +684,9 @@ namespace BlazeGames.IM.Client
 
         private void btn_ProfileSettings_Click(object sender, RoutedEventArgs e)
         {
+            if (AddFriendWindow.Visibility != System.Windows.Visibility.Collapsed)
+                AddFriendWindow.Visibility = System.Windows.Visibility.Collapsed;
+
             this.ProfileSettingsMenu.PlacementTarget = btn_settings;
             this.ProfileSettingsMenu.IsOpen = true;
         }
@@ -685,6 +694,32 @@ namespace BlazeGames.IM.Client
         private void resize_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             ResizeWindow(ResizeDirection.BottomRight);
+        }
+
+        private void btn_call_end_Click(object sender, RoutedEventArgs e)
+        {
+            Button clicked = sender as Button;
+            int MemberID = Convert.ToInt32(clicked.Tag);
+            Contact contact = App.Instance.Contacts[MemberID];
+
+            App.Instance.VCallCore.EndCall(contact.ID);
+            App.Instance.CSocket.SendPacket(Packet.New(Packets.PAK_CLI_CALL_DNY, contact.ID));
+            contact.CallActive = false;
+            SoundManager.VoiceCallingSound.Stop();
+        }
+
+        private void btn_call_start_Click(object sender, RoutedEventArgs e)
+        {
+            Button clicked = sender as Button;
+            int MemberID = Convert.ToInt32(clicked.Tag);
+            Contact contact = App.Instance.Contacts[MemberID];
+
+            if (contact.status != Status.Offline)
+            {
+                App.Instance.CSocket.SendPacket(Packet.New(Packets.PAK_CLI_CALL_RQST, contact.ID, App.Instance.VCallCore.UDPPort, BlazeGames.IM.Client.Core.Utilities.GetLocalAddress()));
+                SoundManager.VoiceCallingSound.PlayLooping();
+                contact.CallActive = true;
+            }
         }
     }
 

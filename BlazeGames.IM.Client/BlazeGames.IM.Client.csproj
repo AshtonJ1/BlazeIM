@@ -4,6 +4,9 @@
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <ExpressionBlendVersion>5.0.30709.0</ExpressionBlendVersion>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -35,7 +38,7 @@
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -71,6 +74,15 @@
     <Reference Include="MahApps.Metro, Version=0.9.0.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MahApps.Metro.0.9.9.45-ALPHA\lib\net40\MahApps.Metro.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NAudio">
+      <HintPath>Resources\NAudio.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OpusWrapper, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Resources\OpusWrapper.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System">
@@ -117,6 +129,9 @@
     <Compile Include="..\Shared\BlazeGames.Networking\Packet.cs">
       <Link>BlazeGames.Networking\Packet.cs</Link>
     </Compile>
+    <Compile Include="ConsoleWindow.xaml.cs">
+      <DependentUpon>ConsoleWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Control_AddFriend.xaml.cs">
       <DependentUpon>Control_AddFriend.xaml</DependentUpon>
     </Compile>
@@ -125,6 +140,9 @@
     </Compile>
     <Compile Include="Controls\Control_Loading.xaml.cs">
       <DependentUpon>Control_Loading.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\IncomingCallWindow.xaml.cs">
+      <DependentUpon>IncomingCallWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Notification.xaml.cs">
       <DependentUpon>Notification.xaml</DependentUpon>
@@ -140,7 +158,9 @@
     <Compile Include="Core\ConfigManager.cs" />
     <Compile Include="Core\Notify.cs" />
     <Compile Include="Core\PluginManager.cs" />
+    <Compile Include="Core\SoundManager.cs" />
     <Compile Include="Core\Utilities.cs" />
+    <Compile Include="Core\VoiceCallCore.cs" />
     <Compile Include="LoadingWindow.xaml.cs">
       <DependentUpon>LoadingWindow.xaml</DependentUpon>
     </Compile>
@@ -162,6 +182,10 @@
     </Compile>
     <Compile Include="SlideFadeIn.cs" />
     <Compile Include="Utilities.cs" />
+    <Page Include="ConsoleWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\Control_AddFriend.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -171,6 +195,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\Control_Loading.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\IncomingCallWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -316,6 +344,24 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\ico_pdf.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NAudio.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NAudio.WindowsMediaFormat.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\opus.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\OpusWrapper.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Phone calling tone.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ringtone-slow.wav" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

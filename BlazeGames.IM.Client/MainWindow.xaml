@@ -34,6 +34,12 @@
             <Canvas Width="48" Height="48" Clip="F1 M 0,0L 48,0L 48,48L 0,48L 0,0" UseLayoutRounding="False" x:Key="appbar_settings">
                 <Path Width="19.6504" Height="19.6504" Canvas.Left="14.1748" Canvas.Top="14.1748" Stretch="Fill" Fill="#FFDADADA" Data="F1 M 24.69,17.5542L 27.9094,14.793C 28.5138,15.05 29.0876,15.3647 29.6241,15.7302L 29.0458,19.93L 33.2747,20.2541C 33.5166,20.8524 33.7023,21.4794 33.8252,22.1286L 30.4458,24.69L 33.207,27.9094C 32.95,28.5137 32.6353,29.0876 32.2698,29.6241L 28.07,29.0458L 27.7459,33.2747C 27.1476,33.5166 26.5206,33.7023 25.8714,33.8252L 23.3099,30.4458L 20.0906,33.207C 19.4862,32.95 18.9124,32.6353 18.3759,32.2698L 18.9542,28.0699L 14.7253,27.7459C 14.4834,27.1476 14.2977,26.5206 14.1748,25.8713L 17.5542,23.3099L 14.793,20.0906C 15.05,19.4862 15.3647,18.9124 15.7302,18.3759L 19.93,18.9542L 20.2541,14.7252C 20.8524,14.4834 21.4794,14.2977 22.1286,14.1748L 24.69,17.5542 Z M 24,20C 21.7909,20 20,21.7909 20,24C 20,26.2091 21.7909,28 24,28C 26.2091,28 28,26.2091 28,24C 28,21.7909 26.2091,20 24,20 Z " />
             </Canvas>
+            <Canvas Width="48" Height="48" Clip="F1 M 0,0L 48,0L 48,48L 0,48L 0,0" UseLayoutRounding="False" x:Key="appbar_phone_green">
+                <Path Width="18.653" Height="26.6725" Canvas.Left="15.8996" Canvas.Top="10.8071" Stretch="Fill" Fill="Green" Data="F1 M 18.4061,11.5099C 19.6792,10.833 20.9357,10.5303 22.3639,11.1256L 24.3127,16.2973L 22.796,17.1038C 20.8455,18.1409 20.105,20.5629 21.1421,22.5134L 24.4284,28.6941C 25.4656,30.6446 27.8875,31.3851 29.8381,30.348L 31.3548,29.5415L 34.5525,34.0491C 34.2474,35.566 33.2938,36.4384 32.0207,37.1154C 28.8511,38.8007 22.1123,34.4558 18.5913,27.8337C 14.8317,20.7629 15.2364,13.1952 18.4061,11.5099 Z " />
+            </Canvas>
+            <Canvas Width="48" Height="48" Clip="F1 M 0,0L 48,0L 48,48L 0,48L 0,0" UseLayoutRounding="False" x:Key="appbar_phone_red">
+                <Path Width="18.653" Height="26.6725" Canvas.Left="15.8996" Canvas.Top="10.8071" Stretch="Fill" Fill="Red" Data="F1 M 18.4061,11.5099C 19.6792,10.833 20.9357,10.5303 22.3639,11.1256L 24.3127,16.2973L 22.796,17.1038C 20.8455,18.1409 20.105,20.5629 21.1421,22.5134L 24.4284,28.6941C 25.4656,30.6446 27.8875,31.3851 29.8381,30.348L 31.3548,29.5415L 34.5525,34.0491C 34.2474,35.566 33.2938,36.4384 32.0207,37.1154C 28.8511,38.8007 22.1123,34.4558 18.5913,27.8337C 14.8317,20.7629 15.2364,13.1952 18.4061,11.5099 Z " />
+            </Canvas>
         </ResourceDictionary>
     </Window.Resources>
     <Window.Background>
@@ -129,6 +135,29 @@
                             </Label.Style>
                         </Label>
                         <TextBlock Text="{Binding NickName}" FontFamily="./resources/#Segoe WP" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="9"/>
+
+                        <Button x:Name="btn_call_start" Tag="{Binding ID}" Visibility="{Binding VCallBtnVisibility}" Grid.Row="1" Width="25" Height="25" VerticalAlignment="Center" HorizontalAlignment="Center" Cursor="Hand" IsDefault="True" Foreground="White" BorderBrush="White" Margin="10" MinHeight="0" Click="btn_call_start_Click">
+                            <Button.Template>
+                                <ControlTemplate TargetType="{x:Type Button}">
+                                    <Rectangle>
+                                        <Rectangle.Fill>
+                                            <VisualBrush Visual="{DynamicResource appbar_phone_green}" />
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                        <Button x:Name="btn_call_end" Tag="{Binding ID}" Visibility="{Binding VEndBtnVisibility}" Grid.Row="1" Width="25" Height="25" VerticalAlignment="Center" HorizontalAlignment="Center" Cursor="Hand" IsDefault="True" Foreground="White" BorderBrush="White" Margin="10" MinHeight="0" Click="btn_call_end_Click">
+                            <Button.Template>
+                                <ControlTemplate TargetType="{x:Type Button}">
+                                    <Rectangle>
+                                        <Rectangle.Fill>
+                                            <VisualBrush Visual="{DynamicResource appbar_phone_red}" />
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
