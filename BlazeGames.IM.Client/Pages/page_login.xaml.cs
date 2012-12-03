@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using BlazeGames.Networking;
 using BlazeGames.IM.Client.Networking;
 using System.Net;
+using System.Threading;
 
 namespace BlazeGames.IM.Client
 {
@@ -30,14 +31,31 @@ namespace BlazeGames.IM.Client
 
         private void btn_login_Click(object sender, RoutedEventArgs e)
         {
+            string HashPassword = Utilities.MD5("BGxSecure" + Utilities.MD5(txt_password.Password));
+
+            /*if (chk_rememberme.IsChecked == true)
+            {
+                ConfigManager.Instance.SetValue("", "");
+                ConfigManager.Instance.SetValue("", HashPassword);
+            }*/
+
             if (!App.Instance.CSocket.RawSocket.Connected)
             {
                 App.Instance.CSocket = new ClientSocket(IPAddress.Parse("209.141.53.112"), 25050);
                 App.Instance.CSocket.ClientSocketPacketReceived_Event += new ClientSocketPacketReceived_Handler(App.Instance.CSocket_ClientSocketPacketReceived_Event);
+                App.Instance.CSocket.ClientSocketConnected_Event += new EventHandler(App.Instance.CSocket_ClientSocketConnected_Event);
+                App.Instance.CSocket.ClientSocketDisconnected_Event += new EventHandler(App.Instance.CSocket_ClientSocketDisconnected_Event);
+                App.Instance.CSocket.ClientSocketConnected_Event += (conn_sender, conn_e) =>
+                {
+                    App.Instance.Dispatcher.BeginInvoke((App.MethodInvoker)delegate
+                    {
+                        App.Instance.CSocket.SendPacket(Packet.New(Packets.PAK_CLI_LGNRQST, txt_account.Text, HashPassword));
+                    }, null);
+                };
                 App.Instance.CSocket.Connect();
             }
-
-            App.Instance.CSocket.SendPacket(Packet.New(Packets.PAK_CLI_LGNRQST, txt_account.Text, Utilities.MD5("BGxSecure" + Utilities.MD5(txt_password.Password))));
+            else
+                App.Instance.CSocket.SendPacket(Packet.New(Packets.PAK_CLI_LGNRQST, txt_account.Text, HashPassword));
 
             Loading.Visibility = Visibility.Visible;
             txt_account.Visibility = Visibility.Hidden;

@@ -32,8 +32,11 @@ namespace BlazeGames.IM.Client
 
             profile_image_source.ImageSource = new System.Windows.Media.Imaging.BitmapImage(new Uri(contact.ProfileImage));
             profile_image.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(contact.status.GetColor());
-            txt_Name.Text = contact.NickName;
+            txt_Name.Text = contact.FullName;
             txt_Status.Text = contact.StatusUpdate;
+
+            txt_Name.Foreground = MainWindow.Instance.Color2;
+            txt_Status.Foreground = MainWindow.Instance.Color2;
 
             if (contact.Pending)
             {

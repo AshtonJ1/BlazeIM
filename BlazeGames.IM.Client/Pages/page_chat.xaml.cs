@@ -26,6 +26,7 @@ namespace BlazeGames.IM.Client
     /// </summary>
     internal partial class page_chat : UserControl
     {
+        int txt_input_height = 85;
         public Contact ChattingWith = null;
         public List<string> Uploads = new List<string>();
 
@@ -37,12 +38,17 @@ namespace BlazeGames.IM.Client
 
             if (Uploads.Count > 0)
             {
-                NotificationWindow.ShowNotification("Upload In Progress", string.Format("Unable to start chatting with {0} since you are currently uploading files.", contact.NickName));
+                NotificationWindow.ShowNotification("Upload In Progress", string.Format("Unable to start chatting with {0} since you are currently uploading files.", contact.FullName));
                 return;
             }
 
             new Thread(new ThreadStart(delegate
                 {
+                    this.Dispatcher.Invoke((App.MethodInvoker)delegate
+                    {
+                        rtf_input.IsEnabled = false;
+                    }, null);
+
                     this.Dispatcher.Invoke((App.MethodInvoker)delegate
                     {
                         ChattingWith = contact;
@@ -51,7 +57,7 @@ namespace BlazeGames.IM.Client
 
                         profile_image_source.ImageSource = new System.Windows.Media.Imaging.BitmapImage(new Uri(contact.ProfileImage));
                         profile_image.BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(contact.status.GetColor());
-                        txt_chattingwith_nickname.Text = contact.NickName;
+                        txt_chattingwith_nickname.Text = contact.FullName;
                         txt_chattingwith_statusupdate.Text = contact.StatusUpdate;
 
                         rtf_output.SelectAll();
@@ -65,16 +71,32 @@ namespace BlazeGames.IM.Client
                         App.Instance.Contacts[contact.ID].LastMessage = DateTime.Now;
                     }, null);
 
-                    foreach (Message msg in contact.Messages)
+                    var Messages = contact.Messages;
+                    int MessagesToLoad = 50;
+                    if (Messages.Count > MessagesToLoad)
+                    {
+                        Messages.Reverse();
+                        Messages.RemoveRange(MessagesToLoad - 1, Messages.Count - MessagesToLoad);
+                        Messages.Reverse();
+                    }
+
+                    foreach (Message msg in Messages)
                     {
                         if ((msg.SendTime - DateTime.Now).Days > 7)
                             continue;
 
                         this.Dispatcher.Invoke((App.MethodInvoker)delegate
                         {
-                            HandleMessage(msg.From, msg.Msg);
+                            HandleMessage(msg.From, msg.Msg, true);
                         }, null);
                     }
+
+                    this.Dispatcher.Invoke((App.MethodInvoker)delegate
+                    {
+                        rtf_input.IsEnabled = true;
+                        rtf_output.ScrollToEnd();
+                        SubscribeAll();
+                    }, null);
                 })).Start();
         }
 
@@ -139,7 +161,7 @@ namespace BlazeGames.IM.Client
         }
 
         string LastMessageFrom = "";
-        public void HandleMessage(string From, string Message)
+        public void HandleMessage(string From, string Message, bool Quick=false)
         {
             try
             {
@@ -150,7 +172,7 @@ namespace BlazeGames.IM.Client
                         append = "\r";
 
                     rtf_output.Selection.Select(rtf_output.Document.ContentEnd, rtf_output.Document.ContentEnd);
-                    rtf_output.Selection.Load(new MemoryStream(Encoding.Default.GetBytes(string.Format("{1}{0} says\r", From, append))), DataFormats.Text);
+                    rtf_output.Selection.Load(new MemoryStream(Encoding.UTF8.GetBytes(string.Format("{1}{0} says\r", From, append))), DataFormats.Text);
                     rtf_output.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(Color.FromRgb(128, 128, 128)));
                     rtf_output.Selection.ApplyPropertyValue(TextElement.FontSizeProperty, 12.00);
                     LastMessageFrom = From;
@@ -158,9 +180,12 @@ namespace BlazeGames.IM.Client
 
                 rtf_output.Selection.Select(rtf_output.Document.ContentEnd, rtf_output.Document.ContentEnd);
                 rtf_output.Selection.Load(new MemoryStream(Encoding.Default.GetBytes(Message.Replace("xmlns=\"default\"", "xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\""))), DataFormats.Xaml);
-                rtf_output.ScrollToEnd();
-                SubscribeToAllHyperlinks(rtf_output.Document);
-                LinkAllUploads();
+
+                if (!Quick)
+                {
+                    rtf_output.ScrollToEnd();
+                    SubscribeAll();
+                }
             }
             catch (Exception ex)
             {
@@ -174,6 +199,12 @@ namespace BlazeGames.IM.Client
                     }
                 }, null);
             }
+        }
+
+        private void SubscribeAll()
+        {
+            SubscribeToAllHyperlinks(rtf_output.Document);
+            LinkAllUploads();
         }
 
         void Input_SentMessage_Execute(object target, ExecutedRoutedEventArgs e)
@@ -216,10 +247,10 @@ namespace BlazeGames.IM.Client
                 if (App.Instance.Contacts.ContainsKey(ChattingWith.ID))
                 {
                     App.Instance.Contacts[ChattingWith.ID].SendMessage(Message);
-                    HandleMessage(App.NickName, Message);
+                    HandleMessage(App.FullName, Message);
                 }
                 else
-                    NotificationWindow.ShowNotification("Unable To Deliver Message", string.Format("{0} is no longer in your contact list.", ChattingWith.NickName));
+                    NotificationWindow.ShowNotification("Unable To Deliver Message", string.Format("{0} is no longer in your contact list.", ChattingWith.FullName));
             }
         }
 
@@ -262,7 +293,7 @@ namespace BlazeGames.IM.Client
                 return;
             }
 
-            HandleMessage(App.NickName, @"<Span xmlns=""default"">
+            HandleMessage(App.FullName, @"<Span xmlns=""default"">
 <Grid Name=""upload_" + UID + @"_control"" Background=""Transparent"" Width=""400"" Height=""100"">
     <Grid.ColumnDefinitions>
         <ColumnDefinition Width=""100""/>
@@ -547,7 +578,7 @@ namespace BlazeGames.IM.Client
                         return;
                     }
 
-                    HandleMessage(App.NickName, @"<Span xmlns=""default"">
+                    HandleMessage(App.FullName, @"<Span xmlns=""default"">
 <Grid Name=""upload_" + UID + @"_control"" Background=""Transparent"" Width=""400"" Height=""100"">
     <Grid.ColumnDefinitions>
         <ColumnDefinition Width=""100""/>
@@ -622,6 +653,11 @@ namespace BlazeGames.IM.Client
                 e.Effects = DragDropEffects.None;
             }
             e.Handled = false;
+        }
+
+        private void rtf_input_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Console.WriteLine("Actual Height: " + rtf_input.ActualHeight);
         }
     }
 }

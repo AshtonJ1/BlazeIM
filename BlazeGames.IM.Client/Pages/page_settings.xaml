@@ -5,9 +5,139 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:local="clr-namespace:BlazeGames.IM.Client"
              mc:Ignorable="d" Width="780" Height="492" Background="{x:Null}">
     <UserControl.Resources>
         <ResourceDictionary>
+        <ControlTemplate x:Key="ScrollViewerControlTemplate" TargetType="{x:Type ScrollViewer}">
+            <Grid x:Name="Grid" Background="{TemplateBinding Background}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Rectangle x:Name="Corner" Grid.Column="1" Fill="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Grid.Row="1"/>
+                <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" CanContentScroll="{TemplateBinding CanContentScroll}" CanHorizontallyScroll="False" CanVerticallyScroll="False" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Grid.RowSpan="2" Margin="{TemplateBinding Padding}" Grid.ColumnSpan="2"/>
+                <ScrollBar x:Name="PART_VerticalScrollBar" AutomationProperties.AutomationId="VerticalScrollBar" Cursor="Arrow" Grid.Column="1" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0" Grid.Row="0" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportHeight}" Width="8"/>
+                <ScrollBar x:Name="PART_HorizontalScrollBar" AutomationProperties.AutomationId="HorizontalScrollBar" Cursor="Arrow" Grid.Column="0" Maximum="{TemplateBinding ScrollableWidth}" Minimum="0" Orientation="Horizontal" Grid.Row="1" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportWidth}" Height="8"/>
+            </Grid>
+        </ControlTemplate>
+
+        <Style x:Key="ScrollBarPageButton" TargetType="{x:Type RepeatButton}">
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Focusable" Value="false"/>
+            <Setter Property="IsTabStop" Value="false"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RepeatButton}">
+                        <Rectangle Fill="{TemplateBinding Background}" Height="{TemplateBinding Height}" Width="{TemplateBinding Width}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="HorizontalThumb" TargetType="{x:Type Thumb}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="4" />
+                                <ColumnDefinition Width="4" />
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="4" />
+                                <ColumnDefinition Width="4" />
+                            </Grid.ColumnDefinitions>
+                            <Rectangle Grid.Column="1" Grid.ColumnSpan="3" Fill="{DynamicResource AccentColor}" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="VerticalThumb" TargetType="{x:Type Thumb}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="4" />
+                                <RowDefinition Height="4" />
+                                <RowDefinition />
+                                <RowDefinition Height="4" />
+                                <RowDefinition Height="4" />
+                            </Grid.RowDefinitions>
+                            <Rectangle Grid.Row="1" Grid.RowSpan="3" Fill="{DynamicResource AccentColor}" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="{x:Type ScrollBar}">
+            <Setter Property="Stylus.IsPressAndHoldEnabled" Value="false"/>
+            <Setter Property="Stylus.IsFlicksEnabled" Value="false"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="Width" Value="4"/>
+            <Setter Property="MinWidth" Value="4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Grid x:Name="Bg" SnapsToDevicePixels="true" Background="{x:Null}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="0.00001*"/>
+                            </Grid.RowDefinitions>
+                            <Track x:Name="PART_Track" IsDirectionReversed="true" IsEnabled="{TemplateBinding IsMouseOver}" Grid.Row="1">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static ScrollBar.PageUpCommand}" Style="{StaticResource ScrollBarPageButton}"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static ScrollBar.PageDownCommand}" Style="{StaticResource ScrollBarPageButton}"/>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Style="{DynamicResource VerticalThumb}" Width="4"/>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="Width" Value="Auto"/>
+                    <Setter Property="MinWidth" Value="0"/>
+                    <Setter Property="Height" Value="4"/>
+                    <Setter Property="MinHeight" Value="4"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ScrollBar}">
+                                <Grid x:Name="Bg" SnapsToDevicePixels="true" Background="{x:Null}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="0.00001*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Track x:Name="PART_Track" Grid.Column="1" IsEnabled="{TemplateBinding IsMouseOver}">
+                                        <Track.DecreaseRepeatButton>
+                                            <RepeatButton Command="{x:Static ScrollBar.PageLeftCommand}" Style="{StaticResource ScrollBarPageButton}"/>
+                                        </Track.DecreaseRepeatButton>
+                                        <Track.IncreaseRepeatButton>
+                                            <RepeatButton Command="{x:Static ScrollBar.PageRightCommand}" Style="{StaticResource ScrollBarPageButton}"/>
+                                        </Track.IncreaseRepeatButton>
+                                        <Track.Thumb>
+                                            <Thumb Style="{DynamicResource HorizontalThumb}" Height="8"/>
+                                        </Track.Thumb>
+                                    </Track>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
@@ -17,71 +147,76 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
                 <ResourceDictionary>
                     <Color x:Key="AccentColor">#FF119EDA</Color>
+                    <SolidColorBrush x:Key="AccentColor2" Color="#FFDADADA" />
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
+    <ScrollViewer Template="{DynamicResource ScrollViewerControlTemplate}" Width="Auto" Height="Auto" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <TabControl HorizontalAlignment="Stretch" Margin="0" VerticalAlignment="Stretch">
-        <TabItem Header="Design" Margin="0" Width="100">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="55" />
-                    <RowDefinition Height="55" />
-                    <RowDefinition Height="55" />
-                    <RowDefinition Height="55" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Label Content="Design Color:" Height="28" HorizontalAlignment="Left" Margin="23,0,0,0" VerticalAlignment="Center" Foreground="White" FontSize="15" FontFamily="Segoe WP" />
-                <xctk:ColorPicker Name="color_designcolor" HorizontalAlignment="Right" Height="28" VerticalAlignment="Center" DisplayColorAndName="False" Width="104" Margin="0,0,15,0" Padding="5" SelectedColor="#FF25A0DA" ShowAdvancedButton="False" ShowStandardColors="True" BorderThickness="0" ShowAvailableColors="False" ShowDropDownButton="False" AvailableColorsHeader="Advanced Colors" />
+            <TabItem Header="Design" Margin="0" Width="100">
+                <local:DynamicCanvas SizeWidthToContent="True" SizeHeightToContent="True" x:Name="page_canvas">
+                    <Label Content="Main Design Color:" Height="28" HorizontalAlignment="Left" Margin="23,20,0,0" VerticalAlignment="Center" Foreground="{DynamicResource AccentColor2}" FontSize="15" FontFamily="Segoe WP" />
+                    <xctk:ColorPicker Name="color_designcolor" HorizontalAlignment="Right" Height="28" VerticalAlignment="Center" DisplayColorAndName="False" Width="104" Margin="275,20,0,0" Padding="5" SelectedColor="#FF25A0DA" ShowAdvancedButton="False" ShowStandardColors="True" BorderThickness="0" ShowAvailableColors="True" ShowDropDownButton="False" AvailableColorsHeader="Advanced Colors" />
 
-                <Label Content="Default Font Color:" Height="28" HorizontalAlignment="Left" Margin="23,0,0,0" VerticalAlignment="Center" Foreground="White" FontSize="15" FontFamily="Segoe WP" Grid.Row="1" />
-                <xctk:ColorPicker Name="color_defaultfontcolor" HorizontalAlignment="Right" Height="28" VerticalAlignment="Center" DisplayColorAndName="False" Width="104" Margin="0,0,15,0" Padding="5" SelectedColor="Black" ShowAdvancedButton="True" ShowStandardColors="False" BorderThickness="0" ShowAvailableColors="True" ShowDropDownButton="False" Grid.Row="1" SelectedColorChanged="color_defaultfontcolor_SelectedColorChanged" />
+                    <Label Content="Secondary Design Color:" Grid.Row="1" Height="28" HorizontalAlignment="Left" Margin="23,70,0,0" VerticalAlignment="Center" Foreground="{DynamicResource AccentColor2}" FontSize="15" FontFamily="Segoe WP" />
+                    <xctk:ColorPicker Name="color_designcolor2" Grid.Row="1" HorizontalAlignment="Right" Height="28" VerticalAlignment="Center" DisplayColorAndName="False" Width="104" Margin="275,70,0,0" Padding="5" SelectedColor="#FFFFFFFF" ShowAdvancedButton="False" ShowStandardColors="True" BorderThickness="0" ShowAvailableColors="True" ShowDropDownButton="False" AvailableColorsHeader="Advanced Colors" />
 
-                <Label Content="Default Font:" Height="28" HorizontalAlignment="Left" Margin="23,0,0,0" VerticalAlignment="Center" Foreground="White" FontSize="15" FontFamily="Segoe WP" Grid.Row="2" />
-                <ComboBox Name="FontsList" Height="28" HorizontalAlignment="Right" VerticalAlignment="Center" ItemsSource="{x:Static Fonts.SystemFontFamilies}" Margin="0,0,15,0" Width="104" IsEditable="False" Grid.Row="2" SelectionChanged="FontsList_SelectionChanged" IsEnabled="True" Loaded="FontsList_Loaded">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding}" FontFamily="{Binding}"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                    <Label Content="Default Font Color:" Height="28" HorizontalAlignment="Left" Margin="23,120,0,0" VerticalAlignment="Center" Foreground="{DynamicResource AccentColor2}" FontSize="15" FontFamily="Segoe WP" Grid.Row="2" />
+                    <xctk:ColorPicker Name="color_defaultfontcolor" HorizontalAlignment="Right" Height="28" VerticalAlignment="Center" DisplayColorAndName="False" Width="104" Margin="275,120,0,0" Padding="5" SelectedColor="Black" ShowAdvancedButton="True" ShowStandardColors="False" BorderThickness="0" ShowAvailableColors="True" ShowDropDownButton="False" Grid.Row="2" SelectedColorChanged="color_defaultfontcolor_SelectedColorChanged" />
 
-                <Label Name="txt_defaultfontsize" Content="Default Font Size:" Height="28" HorizontalAlignment="Left" Margin="23,0,0,0" VerticalAlignment="Center" Foreground="White" FontSize="15" FontFamily="Segoe WP" Grid.Row="3" />
-                <Slider Name="slider_defaultfontsize" Height="28" HorizontalAlignment="Left" Margin="269,0,0,0" VerticalAlignment="Center" Width="100" Minimum="8" Maximum="24" Value="0" Grid.Row="3" SmallChange="1" AutoToolTipPlacement="TopLeft" IsSnapToTickEnabled="False" />
-                
-            </Grid>
-        </TabItem>
-        <TabItem Header="Notifications" Margin="0" Width="170">
+                    <Label Content="Default Font:" Height="28" HorizontalAlignment="Left" Margin="23,170,0,0" VerticalAlignment="Center" Foreground="{DynamicResource AccentColor2}" FontSize="15" FontFamily="Segoe WP" Grid.Row="3" />
+                    <ComboBox Name="FontsList" Height="28" HorizontalAlignment="Right" VerticalAlignment="Center" ItemsSource="{x:Static Fonts.SystemFontFamilies}" Margin="275,170,0,0" Width="104" IsEditable="False" Grid.Row="3" SelectionChanged="FontsList_SelectionChanged" IsEnabled="True" Loaded="FontsList_Loaded">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" FontFamily="{Binding}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <Label Name="txt_defaultfontsize" Content="Default Font Size:" Height="28" HorizontalAlignment="Left" Margin="23,220,0,0" VerticalAlignment="Center" Foreground="{DynamicResource AccentColor2}" FontSize="15" FontFamily="Segoe WP" Grid.Row="4" />
+                    <Slider Name="slider_defaultfontsize" Height="28" HorizontalAlignment="Left" Margin="275,220,0,0" VerticalAlignment="Center" Width="100" Minimum="8" Maximum="24" Value="0" Grid.Row="4" SmallChange="1" AutoToolTipPlacement="TopLeft" IsSnapToTickEnabled="False" />
+
+                    <Label Content="Background Image:" Height="28" HorizontalAlignment="Left" Margin="23,270,0,0" VerticalAlignment="Center" Foreground="{DynamicResource AccentColor2}" FontSize="15" FontFamily="Segoe WP" Grid.Row="5" />
+                    <ComboBox Name="BackgroundsList" Height="28" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="275,270,0,0" Width="104" IsEditable="False" Grid.Row="5" IsEnabled="True" SelectionChanged="BackgroundsList_SelectionChanged">
+                        <ComboBoxItem Content="Default" />
+                        <ComboBoxItem Content="Hills" />
+                        <ComboBoxItem Content="Space" />
+                        <ComboBoxItem Content="Christmas" />
+                        <ComboBoxItem Content="Custom" />
+                        <!--ComboBoxItem Content="Weather (Auto)" /-->
+                    </ComboBox>
+
+                </local:DynamicCanvas>
+            </TabItem>
+            <TabItem Header="Notifications" Margin="0" Width="170">
                 <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Controls:ToggleSwitch Name="chk_txtnotifications" Header="Text Notifications" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10" IsChecked="true" Padding="5" Foreground="White" Checked="chk_notifications_changed"  Unchecked="chk_notifications_changed" Background="{x:Null}" BorderBrush="{x:Null}" OverridesDefaultStyle="False" />
-                <Controls:ToggleSwitch Name="chk_loginnotification" Header="Contact Login" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,82,10,0" IsChecked="true" Padding="5" Foreground="White" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
-                <Controls:ToggleSwitch Name="chk_logoutnotification" Header="Contact Logout" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,144,10,0" IsChecked="true" Padding="5" Foreground="White" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
-                <Controls:ToggleSwitch Name="chk_newrequestnotification" Header="New Contact Request" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,208,10,0" IsChecked="true" Padding="5" Foreground="White" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" SwitchForeground="#FF7C6666" />
-                <Controls:ToggleSwitch Name="chk_newmessagenotification" Header="New Message" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,271,10,0" IsChecked="true" Padding="5" Foreground="White" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
-                <Controls:ToggleSwitch Name="chk_appnotifications" IsEnabled="False" IsChecked="False" Header="App Notifications" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,335,10,0" Padding="5" Foreground="White" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Controls:ToggleSwitch Name="chk_txtnotifications" Header="Text Notifications" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10" IsChecked="true" Padding="5" Foreground="{DynamicResource AccentColor2}" Checked="chk_notifications_changed"  Unchecked="chk_notifications_changed" Background="{x:Null}" BorderBrush="{x:Null}" OverridesDefaultStyle="False" />
+                    <Controls:ToggleSwitch Name="chk_loginnotification" Header="Contact Login" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,82,10,0" IsChecked="true" Padding="5" Foreground="{DynamicResource AccentColor2}" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
+                    <Controls:ToggleSwitch Name="chk_logoutnotification" Header="Contact Logout" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,144,10,0" IsChecked="true" Padding="5" Foreground="{DynamicResource AccentColor2}" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
+                    <Controls:ToggleSwitch Name="chk_newrequestnotification" Header="New Contact Request" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,208,10,0" IsChecked="true" Padding="5" Foreground="{DynamicResource AccentColor2}" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" SwitchForeground="#FF7C6666" />
+                    <Controls:ToggleSwitch Name="chk_newmessagenotification" Header="New Message" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,271,10,0" IsChecked="true" Padding="5" Foreground="{DynamicResource AccentColor2}" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
+                    <Controls:ToggleSwitch Name="chk_appnotifications" IsEnabled="False" IsChecked="False" Header="App Notifications" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10,335,10,0" Padding="5" Foreground="{DynamicResource AccentColor2}" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
 
-                <Controls:ToggleSwitch Name="chk_soundnotifications" Header="Sound Notifications" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Top" IsChecked="true" Grid.Column="1" Padding="5" Foreground="White" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
-                <Controls:ToggleSwitch Name="chk_newmessagesound" Header="New Message Sound" HorizontalAlignment="Stretch" IsChecked="true" Margin="10,82,10,0" Padding="5" VerticalAlignment="Top" Grid.Column="1" Foreground="White" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
-                <Controls:ToggleSwitch Name="chk_appsound" IsEnabled="False" IsChecked="False" Header="App Notification Sounds" HorizontalAlignment="Stretch" Margin="10,144,10,0" Padding="5" VerticalAlignment="Top" Grid.Column="1" Foreground="White" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
-            </Grid>
+                    <Controls:ToggleSwitch Name="chk_soundnotifications" Header="Sound Notifications" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Top" IsChecked="true" Grid.Column="1" Padding="5" Foreground="{DynamicResource AccentColor2}" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
+                    <Controls:ToggleSwitch Name="chk_newmessagesound" Header="New Message Sound" HorizontalAlignment="Stretch" IsChecked="true" Margin="10,82,10,0" Padding="5" VerticalAlignment="Top" Grid.Column="1" Foreground="{DynamicResource AccentColor2}" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
+                    <Controls:ToggleSwitch Name="chk_appsound" IsEnabled="False" IsChecked="False" Header="App Notification Sounds" HorizontalAlignment="Stretch" Margin="10,144,10,0" Padding="5" VerticalAlignment="Top" Grid.Column="1" Foreground="{DynamicResource AccentColor2}" Checked="chk_notifications_changed" Unchecked="chk_notifications_changed" />
+                </Grid>
             </TabItem>
             <TabItem Header="Plugins" Width="103">
-            <Grid>
-                <Label Content="No Plugins Are Installed" Height="28" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="White" />
-            </Grid>
-        </TabItem>
+                <Grid>
+                    <Label Content="No Plugins Are Installed" Height="28" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="{DynamicResource AccentColor2}" />
+                </Grid>
+            </TabItem>
             <TabItem Header="Network">
-            <Grid>
-                <Label Content="Coming Soon" Height="28" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="White" />
-            </Grid>
-        </TabItem>
+                <Grid>
+                    <Label Content="Coming Soon" Height="28" Margin="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="{DynamicResource AccentColor2}" />
+                </Grid>
+            </TabItem>
         </TabControl>
+    </ScrollViewer>
 </UserControl>

@@ -43,7 +43,7 @@ Message
 Stack Trace
 {2}", App.Account, ex.Message, ex.StackTrace, ex.Source, ex.TargetSite.Name, App.Instance.MD5Hash, App.Instance.RetrieveLinkerTimestamp().ToString());
 
-                var response = Encoding.Default.GetString(wc.UploadValues("https://blaze-games.com/issues/?Act=Create", "POST", data));
+                var response = Encoding.UTF8.GetString(wc.UploadValues("https://blaze-games.com/issues/?Act=Create", "POST", data));
                 Console.WriteLine(response);
             }
         }
@@ -58,7 +58,7 @@ Stack Trace
             {
                 wc.UploadDataCompleted += (sender, e) =>
                 {
-                    string Url = Encoding.Default.GetString(e.Result);
+                    string Url = Encoding.UTF8.GetString(e.Result);
                     SendTo.SendMessage(string.Format("<Span xmlns=\"default\"><Image Source=\"{0}\" /></Span>", Url));
                     System.Windows.MessageBox.Show(Url);
                 };

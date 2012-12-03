@@ -26,11 +26,12 @@ namespace BlazeGames.IM.Client.Networking
             //PAK_CLI_GRP_LEAVE       = 0x16,     //  GroupLeave(GroupID)                             *
             //PAK_CLI_GRP_SNDMSG      = 0x17,     //  GroupSendMessage(GroupID, Message)              *
 
-            PAK_CLI_CALL_RQST       = 0x18,     //  CallRequest(MemberID)                           *
-            PAK_CLI_CALL_CNCL       = 0x19,     //  CallCancel(MemberID)                            *
-            PAK_CLI_CALL_ACC        = 0x20,     //  CallAccept(MemberID)                            *
-            PAK_CLI_CALL_DNY        = 0x21,     //  CallDeny(MemberID)                              *
-            PAK_CLI_CALL_END        = 0x22,     //  CallEnd(MemberID)                               *
+            PAK_CLI_CALL_RQST       = 0x18,     //  CallRequest(MemberID)                           
+            PAK_CLI_CALL_CNCL       = 0x19,     //  CallCancel(MemberID)                              *
+            PAK_CLI_CALL_ACC        = 0x20,     //  CallAccept(MemberID)                            
+            PAK_CLI_CALL_DNY        = 0x21,     //  CallDeny(MemberID)                              
+            PAK_CLI_CALL_END        = 0x22,     //  CallEnd(MemberID)                                 *
+            PAK_CLI_VCALL_DATA      = 0x23,     //  VCallData(MemberID)
 
             // PAK_SRV
             PAK_SRV_LGNRESP         = 0x51,     //  LoginResponse(ResponseCode, ID, Nickname, Status)
@@ -47,10 +48,11 @@ namespace BlazeGames.IM.Client.Networking
             //PAK_SRV_GRP_JOINDLVR    = 0x63,     //  GroupJoinDeliver(GroupID, MemID)                *
             //PAK_SRV_GRP_LEAVDLVR    = 0x64,     //  GroupLeaveDeliver(GroupID, MemID)               *
 
-            PAK_SRV_CALL_DLVR       = 0x65,     //  CallDeliver(MemberID, UDPAddress)               *
-            PAK_SRV_CALL_CNCL_DLVR  = 0x66,     //  CallCancelDeliver(MemberID)                     *
-            PAK_SRV_CALL_ACC_DLVR   = 0x67,     //  CallAcceptDeliver(MemberID, UDPAddress)         *
-            PAK_SRV_CALL_DNY_DLVR   = 0x68,     //  CallDenyDeliver(MemberID)                       *
-            PAK_SRV_CALL_END_DLVR   = 0x69;     //  CallEndDeliver(MemberID)                        *
+            PAK_SRV_CALL_DLVR       = 0x65,     //  CallDeliver(MemberID, UDPAddress)               
+            PAK_SRV_CALL_CNCL_DLVR  = 0x66,     //  CallCancelDeliver(MemberID)                       *
+            PAK_SRV_CALL_ACC_DLVR   = 0x67,     //  CallAcceptDeliver(MemberID, UDPAddress)         
+            PAK_SRV_CALL_DNY_DLVR   = 0x68,     //  CallDenyDeliver(MemberID)                       
+            PAK_SRV_CALL_END_DLVR   = 0x69,     //  CallEndDeliver(MemberID)                          *
+            PAK_SRV_VCALL_DATA_DLVR = 0x70;     //  VCallDataDeliver
     }
 }

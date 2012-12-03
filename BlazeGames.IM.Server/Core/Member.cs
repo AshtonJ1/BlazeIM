@@ -29,7 +29,9 @@ namespace BlazeGames.IM.Server.Core
             SecurityAnswer,
             WebSessionKey,
             UserHostAddress,
-            PIN;
+            PIN,
+            NameFontColor,
+            StatusFontColor;
 
         public int ID,
             ZIP,
@@ -41,7 +43,8 @@ namespace BlazeGames.IM.Server.Core
             RequestSecure,
             GlobalSession,
             MobileNotifications,
-            EmailNotifications;
+            EmailNotifications,
+            IsPremiumIM;
 
         public byte StatusCode = 0x00;
 
@@ -117,7 +120,7 @@ namespace BlazeGames.IM.Server.Core
 
         public void Save()
         {
-            MySqlCommand MemberSaveQuery = new MySqlCommand(@"UPDATE members SET LoginName=@LoginName, PasswordHash=@PasswordHash, Nickname=@Nickname, BirthDay=@BirthDay, Email=@Email, FirstName=@FirstName, LastName=@LastName, StreetAddress=@StreetAddress, State=@State, City=@City, ZIP=@ZIP, Country=@Country, EmailVerified=@EmailVerified, VerificationHash=@VerificationHash, Authority=@Authority, Notes=@Notes, MemberData=@MemberData, SecurityQuestion=@SecurityQuestion, SecurityAnswer=@SecurityAnswer, Cash=@Cash, RequestSecure=@RequestSecure, LinkedDevices=@LinkedDevices, MobileNotifications=@MobileNotifications, EmailNotifications=@EmailNotifications, PendingFriends=@PendingFriends, BlockedFriends=@BlockedFriends, Friends=@Friends WHERE ID=@ID", SqlConnection);
+            MySqlCommand MemberSaveQuery = new MySqlCommand(@"UPDATE members SET LoginName=@LoginName, PasswordHash=@PasswordHash, Nickname=@Nickname, BirthDay=@BirthDay, Email=@Email, FirstName=@FirstName, LastName=@LastName, StreetAddress=@StreetAddress, State=@State, City=@City, ZIP=@ZIP, Country=@Country, EmailVerified=@EmailVerified, VerificationHash=@VerificationHash, Authority=@Authority, Notes=@Notes, MemberData=@MemberData, SecurityQuestion=@SecurityQuestion, SecurityAnswer=@SecurityAnswer, Cash=@Cash, RequestSecure=@RequestSecure, LinkedDevices=@LinkedDevices, MobileNotifications=@MobileNotifications, EmailNotifications=@EmailNotifications, PendingFriends=@PendingFriends, BlockedFriends=@BlockedFriends, Friends=@Friends, NameFontColor=@NameFontColor, StatusFontColor=@StatusFontColor, IsPremiumIM=@IsPremiumIM WHERE ID=@ID", SqlConnection);
 
             MemberSaveQuery.Parameters.AddWithValue("@LoginName", this.LoginName);
             MemberSaveQuery.Parameters.AddWithValue("@PasswordHash", this.PasswordHash);
@@ -149,6 +152,9 @@ namespace BlazeGames.IM.Server.Core
             MemberSaveQuery.Parameters.AddWithValue("@PendingFriends", String.Join(",", this.PendingFriends.Distinct().ToArray()));
             MemberSaveQuery.Parameters.AddWithValue("@BlockedFriends", String.Join(",", this.BlockedFriends.Distinct().ToArray()));
             MemberSaveQuery.Parameters.AddWithValue("@Friends", String.Join(",", this.Friends.Distinct().ToArray()));
+            MemberSaveQuery.Parameters.AddWithValue("@NameFontColor", this.NameFontColor);
+            MemberSaveQuery.Parameters.AddWithValue("@StatusFontColor", this.StatusFontColor);
+            MemberSaveQuery.Parameters.AddWithValue("@IsPremiumIM", this.IsPremiumIM);
 
             MemberSaveQuery.ExecuteNonQuery();
         }
@@ -216,6 +222,8 @@ namespace BlazeGames.IM.Server.Core
                     this.SecurityQuestion = MemberLoadReader.GetString("SecurityQuestion");
                     this.SecurityAnswer = MemberLoadReader.GetString("SecurityAnswer");
                     this.PIN = MemberLoadReader.GetString("PIN");
+                    this.NameFontColor = MemberLoadReader.GetString("NameFontColor");
+                    this.StatusFontColor = MemberLoadReader.GetString("StatusFontColor");
 
                     this.ID = MemberLoadReader.GetInt32("ID");
                     this.ZIP = MemberLoadReader.GetInt32("ZIP");
@@ -233,7 +241,12 @@ namespace BlazeGames.IM.Server.Core
                     this.GlobalSession = MemberLoadReader.GetBoolean("GlobalSession");
                     this.MobileNotifications = MemberLoadReader.GetBoolean("MobileNotifications");
                     this.EmailNotifications = MemberLoadReader.GetBoolean("EmailNotifications");
+                    this.IsPremiumIM = MemberLoadReader.GetBoolean("IsPremiumIM");
                     this.IsValid = true;
+
+                    Nickname = char.ToUpper(Nickname[0]) + Nickname.Substring(1);
+                    FirstName = char.ToUpper(FirstName[0]) + FirstName.Substring(1);
+                    LastName = char.ToUpper(LastName[0]) + LastName.Substring(1);
                 }
                 else
                 {

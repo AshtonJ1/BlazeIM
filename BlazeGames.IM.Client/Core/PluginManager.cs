@@ -40,11 +40,11 @@ namespace BlazeGames.IM.Plugins
 
             foreach (FileInfo fi in di.GetFiles("*.dll"))
             {
-                LoadPlugin(fi.FullName);
+                LoadPlugin(fi.FullName, fi.Name);
             }
         }
 
-        public void LoadPlugin(string FilePath)
+        public void LoadPlugin(string FilePath, string AssemblyName)
         {
             Assembly asm = Assembly.LoadFile(FilePath);
             Type type = asm.GetType("BlazeGames.IM.TestPlugin.IMPlugin");
@@ -82,45 +82,14 @@ namespace BlazeGames.IM.Plugins
                 return false;
         }
 
-        public bool RequestHomePage()
+        public bool AddControl(Control control)
         {
-            /*if (Pages.Count > 0)
-            {
-                Pages[0].Visibility = Visibility.Visible;
-                return true;
-            }
-            else*/
-                return false;
+            return false;
         }
 
-        /// <summary>
-        /// Copy an object to destination object, only matching fields will be copied
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="sourceObject">An object with matching fields of the destination object</param>
-        /// <param name="destObject">Destination object, must already be created</param>
-        private void CopyObject<T>(object sourceObject, ref T destObject)
+        public bool RequestHomePage()
         {
-            //	If either the source, or destination is null, return
-            if (sourceObject == null || destObject == null)
-                return;
-
-            //	Get the type of each object
-            Type sourceType = sourceObject.GetType();
-            Type targetType = destObject.GetType();
-
-            //	Loop through the source properties
-            foreach (PropertyInfo p in sourceType.GetProperties())
-            {
-                //	Get the matching property in the destination object
-                PropertyInfo targetObj = targetType.GetProperty(p.Name);
-                //	If there is none, skip
-                if (targetObj == null)
-                    continue;
-
-                //	Set the value in the destination
-                targetObj.SetValue(destObject, p.GetValue(sourceObject, null), null);
-            }
+            return false;
         }
     }
 
@@ -132,7 +101,7 @@ namespace BlazeGames.IM.Plugins
         string Author { get; }
         string Company { get; }
         string Description { get; }
-        string ImageUrl { get; }
+        bool ShowIconOnHomescreen { get; }
 
         void PluginLoaded();
         void PluginUnloaded();

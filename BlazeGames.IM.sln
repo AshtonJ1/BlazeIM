@@ -14,9 +14,24 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BlazeGames.Networking", "Bl
 		Shared\BlazeGames.Networking\ServerSocket.cs = Shared\BlazeGames.Networking\ServerSocket.cs
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazeGames.IM.Client.Web", "BlazeGames.IM.Client.Web\BlazeGames.IM.Client.Web.csproj", "{087B2079-BD1B-4585-8521-7B96F93885A9}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazeGames.IM.Client.RT", "BlazeGames.IM.Client.RT\BlazeGames.IM.Client.RT.csproj", "{1CC17995-FFDE-4EA1-9E8B-6091B11797B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazeGames.IM.Server.CallProxy", "BlazeGames.IM.Server.CallProxy\BlazeGames.IM.Server.CallProxy.csproj", "{1EB3E087-6BF4-4618-BAFB-9505F39F9D74}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazeGames.IM.Client.WeatherPlugin", "BlazeGames.IM.Client.WeatherPlugin\BlazeGames.IM.Client.WeatherPlugin.csproj", "{A1CAC501-B274-44E4-AD9A-10C01D84BD1C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProxySocket", "ProxySocket", "{D09F5998-7DEA-4AFF-ADFF-C169DF7D7984}"
+	ProjectSection(SolutionItems) = preProject
+		Shared\BlazeGames.Networking\ProxySocket\AuthMethod.cs = Shared\BlazeGames.Networking\ProxySocket\AuthMethod.cs
+		Shared\BlazeGames.Networking\ProxySocket\AuthNone.cs = Shared\BlazeGames.Networking\ProxySocket\AuthNone.cs
+		Shared\BlazeGames.Networking\ProxySocket\AuthUserPass.cs = Shared\BlazeGames.Networking\ProxySocket\AuthUserPass.cs
+		Shared\BlazeGames.Networking\ProxySocket\IAsyncProxyResult.cs = Shared\BlazeGames.Networking\ProxySocket\IAsyncProxyResult.cs
+		Shared\BlazeGames.Networking\ProxySocket\ProxyException.cs = Shared\BlazeGames.Networking\ProxySocket\ProxyException.cs
+		Shared\BlazeGames.Networking\ProxySocket\ProxySocket.cs = Shared\BlazeGames.Networking\ProxySocket\ProxySocket.cs
+		Shared\BlazeGames.Networking\ProxySocket\Socks4Handler.cs = Shared\BlazeGames.Networking\ProxySocket\Socks4Handler.cs
+		Shared\BlazeGames.Networking\ProxySocket\Socks5Handler.cs = Shared\BlazeGames.Networking\ProxySocket\Socks5Handler.cs
+		Shared\BlazeGames.Networking\ProxySocket\SocksHandler.cs = Shared\BlazeGames.Networking\ProxySocket\SocksHandler.cs
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,20 +75,6 @@ Global
 		{427ACE16-2913-4820-9DCE-3B9B1DFACD2D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{427ACE16-2913-4820-9DCE-3B9B1DFACD2D}.Release|x64.ActiveCfg = Release|Any CPU
 		{427ACE16-2913-4820-9DCE-3B9B1DFACD2D}.Release|x86.ActiveCfg = Release|Any CPU
-		{087B2079-BD1B-4585-8521-7B96F93885A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{087B2079-BD1B-4585-8521-7B96F93885A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{087B2079-BD1B-4585-8521-7B96F93885A9}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{087B2079-BD1B-4585-8521-7B96F93885A9}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{087B2079-BD1B-4585-8521-7B96F93885A9}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{087B2079-BD1B-4585-8521-7B96F93885A9}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{087B2079-BD1B-4585-8521-7B96F93885A9}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{087B2079-BD1B-4585-8521-7B96F93885A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{087B2079-BD1B-4585-8521-7B96F93885A9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{087B2079-BD1B-4585-8521-7B96F93885A9}.Release|ARM.ActiveCfg = Release|Any CPU
-		{087B2079-BD1B-4585-8521-7B96F93885A9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{087B2079-BD1B-4585-8521-7B96F93885A9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{087B2079-BD1B-4585-8521-7B96F93885A9}.Release|x64.ActiveCfg = Release|Any CPU
-		{087B2079-BD1B-4585-8521-7B96F93885A9}.Release|x86.ActiveCfg = Release|Any CPU
 		{1CC17995-FFDE-4EA1-9E8B-6091B11797B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1CC17995-FFDE-4EA1-9E8B-6091B11797B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CC17995-FFDE-4EA1-9E8B-6091B11797B3}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
@@ -104,11 +105,40 @@ Global
 		{1CC17995-FFDE-4EA1-9E8B-6091B11797B3}.Release|x86.ActiveCfg = Release|x86
 		{1CC17995-FFDE-4EA1-9E8B-6091B11797B3}.Release|x86.Build.0 = Release|x86
 		{1CC17995-FFDE-4EA1-9E8B-6091B11797B3}.Release|x86.Deploy.0 = Release|x86
+		{1EB3E087-6BF4-4618-BAFB-9505F39F9D74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EB3E087-6BF4-4618-BAFB-9505F39F9D74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EB3E087-6BF4-4618-BAFB-9505F39F9D74}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{1EB3E087-6BF4-4618-BAFB-9505F39F9D74}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{1EB3E087-6BF4-4618-BAFB-9505F39F9D74}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{1EB3E087-6BF4-4618-BAFB-9505F39F9D74}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1EB3E087-6BF4-4618-BAFB-9505F39F9D74}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1EB3E087-6BF4-4618-BAFB-9505F39F9D74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EB3E087-6BF4-4618-BAFB-9505F39F9D74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EB3E087-6BF4-4618-BAFB-9505F39F9D74}.Release|ARM.ActiveCfg = Release|Any CPU
+		{1EB3E087-6BF4-4618-BAFB-9505F39F9D74}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{1EB3E087-6BF4-4618-BAFB-9505F39F9D74}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{1EB3E087-6BF4-4618-BAFB-9505F39F9D74}.Release|x64.ActiveCfg = Release|Any CPU
+		{1EB3E087-6BF4-4618-BAFB-9505F39F9D74}.Release|x86.ActiveCfg = Release|Any CPU
+		{A1CAC501-B274-44E4-AD9A-10C01D84BD1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1CAC501-B274-44E4-AD9A-10C01D84BD1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1CAC501-B274-44E4-AD9A-10C01D84BD1C}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{A1CAC501-B274-44E4-AD9A-10C01D84BD1C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{A1CAC501-B274-44E4-AD9A-10C01D84BD1C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{A1CAC501-B274-44E4-AD9A-10C01D84BD1C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A1CAC501-B274-44E4-AD9A-10C01D84BD1C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A1CAC501-B274-44E4-AD9A-10C01D84BD1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1CAC501-B274-44E4-AD9A-10C01D84BD1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1CAC501-B274-44E4-AD9A-10C01D84BD1C}.Release|ARM.ActiveCfg = Release|Any CPU
+		{A1CAC501-B274-44E4-AD9A-10C01D84BD1C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{A1CAC501-B274-44E4-AD9A-10C01D84BD1C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{A1CAC501-B274-44E4-AD9A-10C01D84BD1C}.Release|x64.ActiveCfg = Release|Any CPU
+		{A1CAC501-B274-44E4-AD9A-10C01D84BD1C}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F6A04503-81C0-4F18-8CB8-B36E19554E19} = {F08198DA-EB98-4A4B-A160-DEBB54E92692}
+		{D09F5998-7DEA-4AFF-ADFF-C169DF7D7984} = {F6A04503-81C0-4F18-8CB8-B36E19554E19}
 	EndGlobalSection
 EndGlobal

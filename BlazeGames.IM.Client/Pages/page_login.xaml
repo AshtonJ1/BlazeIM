@@ -17,53 +17,43 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
                 <ResourceDictionary>
                     <SolidColorBrush x:Key="AccentColor" Color="#FF119EDA" />
+                    <SolidColorBrush x:Key="AccentColor2" Color="#FFDADADA" />
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
-            
-            <Canvas Width="48" Height="48" Clip="F1 M 0,0L 48,0L 48,48L 0,48L 0,0" UseLayoutRounding="False" x:Key="appbar_arrow_right">
-                <Path Width="25" Height="18" Canvas.Left="12" Canvas.Top="15" Stretch="Fill" Fill="White" Data="F1 M 12,22L 12,26L 28.25,26L 21,33L 27.5,33L 37,24L 27.5,15L 21,15L 28.25,22L 12,22 Z " />
-            </Canvas>
-            
-            <Canvas Width="48" Height="48" Clip="F1 M 0,0L 48,0L 48,48L 0,48L 0,0" x:Key="appbar_close">
-                <Path Width="20" Height="20" Canvas.Left="14" Canvas.Top="14" Stretch="Fill" Fill="White" Data="F1 M 17,14L 24,21L 30.9999,14.0001L 33.9999,17.0001L 27,24L 33.9999,31L 31,34L 24,27L 17,34L 14,31L 21,24L 14,17L 17,14 Z " />
-            </Canvas>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
         <TextBox x:Name="txt_account" FontFamily="./resources/#Segoe WP" TabIndex="1" Controls:TextboxHelper.ClearTextButton="True" Controls:TextboxHelper.Watermark="Account" Height="23" TextWrapping="Wrap" Width="120" Margin="0,-30,0,0" BorderBrush="#19FFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" TextChanged="txt_account_TextChanged"/>
         <PasswordBox x:Name="txt_password" FontFamily="./resources/#Segoe WP" TabIndex="2" Controls:TextboxHelper.ClearTextButton="True" Controls:TextboxHelper.Watermark="Password" VerticalAlignment="Center" HorizontalAlignment="Center" Width="120" Height="23" Margin="0,30,0,0" BorderBrush="#19FFFFFF" Background="White" Foreground="#FF636363" VerticalContentAlignment="Center"/>
-        <Button x:Name="btn_login" TabIndex="3" Style="{DynamicResource MetroCircleButtonStyle}" Margin="0,0,10,10" Width="55" Height="55" VerticalAlignment="Bottom" HorizontalAlignment="Right" Cursor="Hand" Click="btn_login_Click" IsDefault="True" Foreground="White" BorderBrush="White" >
-            <Button.Background>
-                <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
-                    <GradientStop Color="#FFF3F3F3" Offset="0"/>
-                    <GradientStop Color="#FFEBEBEB" Offset="0.5"/>
-                    <GradientStop Color="#FFDDDDDD" Offset="0.5"/>
-                    <GradientStop Color="White" Offset="1"/>
-                </LinearGradientBrush>
-            </Button.Background>
+        <Button x:Name="btn_login" TabIndex="3" Style="{DynamicResource MetroCircleButtonStyle}" Margin="0,0,10,10" Width="55" Height="55" VerticalAlignment="Bottom" HorizontalAlignment="Right" Cursor="Hand" Click="btn_login_Click" IsDefault="True" Foreground="{DynamicResource AccentColor2}" >
             <Rectangle Width="20" Height="20">
                 <Rectangle.Fill>
-                    <VisualBrush Visual="{DynamicResource appbar_arrow_right}" />
+                    <VisualBrush>
+                        <VisualBrush.Visual>
+                            <Canvas Width="48" Height="48" Clip="F1 M 0,0L 48,0L 48,48L 0,48L 0,0" UseLayoutRounding="False">
+                                <Path Width="25" Height="18" Canvas.Left="12" Canvas.Top="15" Stretch="Fill" Fill="{DynamicResource AccentColor2}" Data="F1 M 12,22L 12,26L 28.25,26L 21,33L 27.5,33L 37,24L 27.5,15L 21,15L 28.25,22L 12,22 Z " />
+                            </Canvas>
+                        </VisualBrush.Visual>
+                    </VisualBrush>
                 </Rectangle.Fill>
             </Rectangle>
         </Button>
-        <Button x:Name="btn_close" TabIndex="4" Style="{DynamicResource MetroCircleButtonStyle}" Margin="10" Width="55" Height="55" VerticalAlignment="Bottom" HorizontalAlignment="Left" Cursor="Hand" Foreground="White" BorderBrush="White" Click="btn_close_Click" IsCancel="True" >
-            <Button.Background>
-                <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
-                    <GradientStop Color="#FFF3F3F3" Offset="0"/>
-                    <GradientStop Color="#FFEBEBEB" Offset="0.5"/>
-                    <GradientStop Color="#FFDDDDDD" Offset="0.5"/>
-                    <GradientStop Color="White" Offset="1"/>
-                </LinearGradientBrush>
-            </Button.Background>
+        <Button x:Name="btn_close" TabIndex="4" Style="{DynamicResource MetroCircleButtonStyle}" Margin="10" Width="55" Height="55" VerticalAlignment="Bottom" HorizontalAlignment="Left" Cursor="Hand" Foreground="{DynamicResource AccentColor2}" BorderBrush="White" Click="btn_close_Click" IsCancel="True" >
             <Rectangle Width="20" Height="20">
                 <Rectangle.Fill>
-                    <VisualBrush Visual="{DynamicResource appbar_close}" />
+                    <VisualBrush>
+                        <VisualBrush.Visual>
+                            <Canvas Width="48" Height="48" Clip="F1 M 0,0L 48,0L 48,48L 0,48L 0,0">
+                                <Path Width="20" Height="20" Canvas.Left="14" Canvas.Top="14" Stretch="Fill" Fill="{DynamicResource AccentColor2}" Data="F1 M 17,14L 24,21L 30.9999,14.0001L 33.9999,17.0001L 27,24L 33.9999,31L 31,34L 24,27L 17,34L 14,31L 21,24L 14,17L 17,14 Z " />
+                            </Canvas>
+                        </VisualBrush.Visual>
+                    </VisualBrush>
                 </Rectangle.Fill>
             </Rectangle>
         </Button>
 
-        <Label x:Name="txt_loading" FontFamily="./resources/#Segoe WP" Visibility="Hidden" Margin="0" VerticalAlignment="Center" Foreground="White" FontSize="24" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="50" Content="Loading Your Account"/>
+        <Label x:Name="txt_loading" FontFamily="./resources/#Segoe WP" Visibility="Hidden" Margin="0" VerticalAlignment="Center" Foreground="{DynamicResource AccentColor2}" FontSize="24" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="50" Content="Loading Your Account"/>
         <Controls:ProgressIndicator  x:Name="Loading" Margin="-10,35,0,0" Height="6" VerticalAlignment="Center" ProgressColour="{DynamicResource AccentColor}"/>
+        <CheckBox x:Name="chk_rememberme" Content="Remember Me" HorizontalAlignment="Center" Margin="0,80,0,0" VerticalAlignment="Center" Visibility="Collapsed"/>
     </Grid>
 </UserControl>

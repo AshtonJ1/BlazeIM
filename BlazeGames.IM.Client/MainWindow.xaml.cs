@@ -35,7 +35,24 @@ namespace BlazeGames.IM.Client
 
         public Microsoft.Win32.OpenFileDialog dialog;
 
-        public Brush Color;
+        public bool Minimum = false;
+        public bool Desktop = false;
+
+        public SolidColorBrush Color;
+        private SolidColorBrush _Color2;
+        public SolidColorBrush Color2
+        {
+            get { return _Color2; }
+            set
+            {
+                _Color2 = value;
+                foreach (Contact contact in App.Instance.Contacts.Values)
+                {
+                    contact.control.txt_Name.Foreground = value;
+                    contact.control.txt_Status.Foreground = value;
+                }
+            }
+        }
 
         static MainWindow()
         {
@@ -64,6 +81,19 @@ namespace BlazeGames.IM.Client
             dialog.Filter = "Image Files|*.png;*.jpg;*.bmp;*.jpeg";
             dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
             dialog.FileOk += new CancelEventHandler(dialog_FileOk);
+
+            try
+            {
+                int Width = Convert.ToInt32(ConfigManager.Instance.GetString("WndWidth", this.Width.ToString()));
+                int Height = Convert.ToInt32(ConfigManager.Instance.GetString("WndHeight", this.Height.ToString()));
+
+                if (Width >= SystemParameters.WorkArea.Width || Height >= SystemParameters.WorkArea.Height)
+                    return;
+
+                this.Width = Width;
+                this.Height = Height;
+            }
+            catch { }
         }
 
         private const int WM_SYSCOMMAND = 0x112;
@@ -211,7 +241,7 @@ namespace BlazeGames.IM.Client
             if (AddFriendWindow.Visibility == System.Windows.Visibility.Visible)
                 AddFriendWindow.Visibility = System.Windows.Visibility.Collapsed;
 
-            if (e.LeftButton == MouseButtonState.Pressed && !Minimum)
+            if (e.LeftButton == MouseButtonState.Pressed && !Minimum && !Desktop)
             {
                 DragMove();
             }
@@ -226,26 +256,28 @@ namespace BlazeGames.IM.Client
 
         public string CurrentPage = "login";
 
-        public bool Minimum = false;
         private Contact[] TmpOpenChats = null;
         private void btn_minimize_Click(object sender, RoutedEventArgs e)
         {
-            TmpOpenChats = App.Instance.OpenChats.ToArray();
-            App.Instance.OpenChats.Clear();
-            view.Refresh();
-            SlideFade.CreateAnimationInMinimum(listbox1);
-            App.Instance.OpenChats.AddRange(App.Instance.Contacts.Values.ToArray());
-            view.Refresh();
+            if (!Desktop)
+            {
+                TmpOpenChats = App.Instance.OpenChats.ToArray();
+                App.Instance.OpenChats.Clear();
+                view.Refresh();
+                SlideFade.CreateAnimationInMinimum(listbox1);
+                App.Instance.OpenChats.AddRange(App.Instance.Contacts.Values.ToArray());
+                view.Refresh();
 
-            Topmost = true;
+                Topmost = true;
 
-            /*LastLeft = Left;
-            Width = 70;
-            Left = SystemParameters.PrimaryScreenWidth - 70;
-            Minimum = true;*/
-            SlideFade.CreateAnimationToMinimum();
-            btn_maximum1.Visibility = System.Windows.Visibility.Visible;
-            btn_maximum2.Visibility = System.Windows.Visibility.Visible;
+                /*LastLeft = Left;
+                Width = 70;
+                Left = SystemParameters.PrimaryScreenWidth - 70;
+                Minimum = true;*/
+                SlideFade.CreateAnimationToMinimum();
+                btn_maximum1.Visibility = System.Windows.Visibility.Visible;
+                btn_maximum2.Visibility = System.Windows.Visibility.Visible;
+            }
         }
 
         private void btn_settings_Click(object sender, RoutedEventArgs e)
@@ -452,6 +484,46 @@ namespace BlazeGames.IM.Client
         private void txt_search_TextChanged(object sender, TextChangedEventArgs e)
         {
             this.page_Contacts.Draw();
+
+            /*if (txt_search.Text == "%RAINBOW%")
+            {
+                SolidColorBrush RainbowBrush = new SolidColorBrush(Colors.Red);
+
+                ColorAnimation[] RainbowAnimations = new ColorAnimation[]
+                {
+                    new ColorAnimation(Colors.Red, TimeSpan.FromSeconds(1)) { BeginTime = TimeSpan.FromSeconds(0), RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever },
+                    new ColorAnimation(Colors.Orange, TimeSpan.FromSeconds(1)) { BeginTime = TimeSpan.FromSeconds(1), RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever },
+                    new ColorAnimation(Colors.Yellow, Colors.Orange, TimeSpan.FromSeconds(1)) { BeginTime = TimeSpan.FromSeconds(2), RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever },
+                    new ColorAnimation(Colors.Green, Colors.Orange, TimeSpan.FromSeconds(1)) { BeginTime = TimeSpan.FromSeconds(3), RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever },
+                    new ColorAnimation(Colors.Blue, Colors.Orange, TimeSpan.FromSeconds(1)) { BeginTime = TimeSpan.FromSeconds(4), RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever },
+                    new ColorAnimation(Colors.Indigo, Colors.Orange, TimeSpan.FromSeconds(1)) { BeginTime = TimeSpan.FromSeconds(5), RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever },
+                    new ColorAnimation(Colors.Violet, Colors.Orange, TimeSpan.FromSeconds(1)) { BeginTime = TimeSpan.FromSeconds(6), RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever }
+                };
+
+                Storyboard RainbowAnimationStoryboard = new Storyboard();
+                Storyboard.SetTarget(RainbowAnimationStoryboard, RainbowBrush);
+
+                foreach (ColorAnimation Animation in RainbowAnimations)
+                {
+                    Storyboard.SetTarget(Animation, RainbowAnimationStoryboard);
+                    Storyboard.SetTargetProperty(Animation, new PropertyPath(SolidColorBrush.ColorProperty));
+                }
+
+                RainbowAnimationStoryboard.Children.Add(RainbowAnimations[0]);
+                RainbowAnimationStoryboard.Children.Add(RainbowAnimations[1]);
+                RainbowAnimationStoryboard.Children.Add(RainbowAnimations[2]);
+                RainbowAnimationStoryboard.Children.Add(RainbowAnimations[3]);
+                RainbowAnimationStoryboard.Children.Add(RainbowAnimations[4]);
+                RainbowAnimationStoryboard.Children.Add(RainbowAnimations[5]);
+                RainbowAnimationStoryboard.Children.Add(RainbowAnimations[6]);
+
+                RainbowAnimationStoryboard.SpeedRatio = 3;
+                RainbowAnimationStoryboard.Begin();
+                
+                txt_nickname.Foreground = RainbowBrush;
+
+                txt_search.Text = "";
+            }*/
         }
 
         private void txt_search_GotFocus(object sender, RoutedEventArgs e)
@@ -627,6 +699,13 @@ namespace BlazeGames.IM.Client
 
         private void wnd_Closing(object sender, CancelEventArgs e)
         {
+            if (!Minimum)
+            {
+                ConfigManager.Instance.SetValue("WndWidth", this.Width.ToString());
+                ConfigManager.Instance.SetValue("WndHeight", this.Height.ToString());
+                ConfigManager.Instance.Save();
+            }
+
             NotificationWindow.ForceClose();
 
             try
@@ -693,7 +772,23 @@ namespace BlazeGames.IM.Client
 
         private void resize_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            ResizeWindow(ResizeDirection.BottomRight);
+            if (!Minimum && !Desktop)
+            {
+                Rectangle resizecontrol = sender as Rectangle;
+                switch(resizecontrol.Name)
+                {
+                    case "resize_Top": ResizeWindow(ResizeDirection.Top); break;
+                    case "resize_Bottom": ResizeWindow(ResizeDirection.Bottom); break;
+                    case "resize_Left": ResizeWindow(ResizeDirection.Left); break;
+                    case "resize_Right": ResizeWindow(ResizeDirection.Right); break;
+
+                    case "resize_TopLeft": ResizeWindow(ResizeDirection.TopLeft); break;
+                    case "resize_TopRight": ResizeWindow(ResizeDirection.TopRight); break;
+                    case "resize_BottomLeft": ResizeWindow(ResizeDirection.BottomLeft); break;
+                    case "resize_BottomRight": ResizeWindow(ResizeDirection.BottomRight); break;
+                    default: break;
+                }
+            }
         }
 
         private void btn_call_end_Click(object sender, RoutedEventArgs e)
@@ -720,6 +815,57 @@ namespace BlazeGames.IM.Client
                 SoundManager.VoiceCallingSound.PlayLooping();
                 contact.CallActive = true;
             }
+        }
+
+        private void btn_desktop_Click(object sender, RoutedEventArgs e)
+        {
+            if (!Minimum)
+            {
+                if (Desktop)
+                {
+                    try
+                    {
+                        int Width = Convert.ToInt32(ConfigManager.Instance.GetString("WndWidth", this.Width.ToString()));
+                        int Height = Convert.ToInt32(ConfigManager.Instance.GetString("WndHeight", this.Height.ToString()));
+
+                        if (Width >= SystemParameters.WorkArea.Width || Height >= SystemParameters.WorkArea.Height)
+                        {
+                            this.Width = 850;
+                            this.Height = 575;
+                        }
+                        else
+                        {
+                            this.Width = Width;
+                            this.Height = Height;
+                        }
+                    }
+                    catch
+                    {
+                        this.Width = 850;
+                        this.Height = 575;
+                    }
+
+                    btn_desktop.IsChecked = false;
+                    btn_desktop1.IsChecked = false;
+                    Desktop = false;
+                }
+                else
+                {
+                    this.Left = 0;
+                    this.Top = 0;
+                    this.Width = SystemParameters.WorkArea.Width;
+                    this.Height = SystemParameters.WorkArea.Height;
+
+                    btn_desktop.IsChecked = true;
+                    btn_desktop1.IsChecked = true;
+                    Desktop = true;
+                }
+            }
+        }
+
+        private void btn_disconnect_Click(object sender, RoutedEventArgs e)
+        {
+            App.Instance.CSocket.Disconnect();
         }
     }
 

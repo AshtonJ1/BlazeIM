@@ -53,6 +53,33 @@
     <Compile Include="..\Shared\BlazeGames.Networking\Packet.cs">
       <Link>BlazeGames.Networking\Packet.cs</Link>
     </Compile>
+    <Compile Include="..\Shared\BlazeGames.Networking\ProxySocket\AuthMethod.cs">
+      <Link>BlazeGames.Networking\ProxySocket\AuthMethod.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\BlazeGames.Networking\ProxySocket\AuthNone.cs">
+      <Link>BlazeGames.Networking\ProxySocket\AuthNone.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\BlazeGames.Networking\ProxySocket\AuthUserPass.cs">
+      <Link>BlazeGames.Networking\ProxySocket\AuthUserPass.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\BlazeGames.Networking\ProxySocket\IAsyncProxyResult.cs">
+      <Link>BlazeGames.Networking\ProxySocket\IAsyncProxyResult.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\BlazeGames.Networking\ProxySocket\ProxyException.cs">
+      <Link>BlazeGames.Networking\ProxySocket\ProxyException.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\BlazeGames.Networking\ProxySocket\ProxySocket.cs">
+      <Link>BlazeGames.Networking\ProxySocket\ProxySocket.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\BlazeGames.Networking\ProxySocket\Socks4Handler.cs">
+      <Link>BlazeGames.Networking\ProxySocket\Socks4Handler.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\BlazeGames.Networking\ProxySocket\Socks5Handler.cs">
+      <Link>BlazeGames.Networking\ProxySocket\Socks5Handler.cs</Link>
+    </Compile>
+    <Compile Include="..\Shared\BlazeGames.Networking\ProxySocket\SocksHandler.cs">
+      <Link>BlazeGames.Networking\ProxySocket\SocksHandler.cs</Link>
+    </Compile>
     <Compile Include="..\Shared\BlazeGames.Networking\ServerSocket.cs">
       <Link>BlazeGames.Networking\ServerSocket.cs</Link>
     </Compile>

@@ -8,7 +8,7 @@
     <UserControl.ContextMenu>
         <ContextMenu>
             <ContextMenu.Items>
-                <MenuItem Name="btn_voicecall" Header="Call" Click="btn_voicecall_Click" />
+                <MenuItem Visibility="Collapsed" Name="btn_voicecall" Header="Call" Click="btn_voicecall_Click" />
                 <MenuItem Name="btn_acceptfriend" Header="Accept Contact Request" Click="btn_acceptfriend_Click" Visibility="Collapsed" />
                 <MenuItem Name="btn_denyfriend" Header="Deny Contact Request" Visibility="Collapsed" Click="btn_denyfriend_Click" />
                 

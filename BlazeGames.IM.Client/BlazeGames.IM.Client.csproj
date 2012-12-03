@@ -50,7 +50,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -80,9 +80,13 @@
       <HintPath>Resources\NAudio.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="OpusWrapper, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>Resources\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NSpeex, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Resources\OpusWrapper.dll</HintPath>
+      <HintPath>Resources\NSpeex.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System">
@@ -90,6 +94,7 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MahApps.Metro.0.9.9.45-ALPHA\lib\net40\System.Windows.Interactivity.dll</HintPath>
@@ -156,11 +161,15 @@
       <DependentUpon>UploadFileControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Core\ConfigManager.cs" />
+    <Compile Include="Core\NewVoiceCallCore.cs" />
     <Compile Include="Core\Notify.cs" />
     <Compile Include="Core\PluginManager.cs" />
+    <Compile Include="Core\ResourceManager.cs" />
     <Compile Include="Core\SoundManager.cs" />
+    <Compile Include="Core\UPnP.cs" />
     <Compile Include="Core\Utilities.cs" />
     <Compile Include="Core\VoiceCallCore.cs" />
+    <Compile Include="Core\WeatherApi.cs" />
     <Compile Include="LoadingWindow.xaml.cs">
       <DependentUpon>LoadingWindow.xaml</DependentUpon>
     </Compile>
@@ -179,6 +188,11 @@
     </Compile>
     <Compile Include="Pages\page_login.xaml.cs">
       <DependentUpon>page_login.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SlideFadeIn.cs" />
     <Compile Include="Utilities.cs" />
@@ -218,6 +232,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\Design.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\page_settings.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -254,11 +272,6 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -325,27 +338,6 @@
     <None Include="Resources\FluidKit.dll" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\ico_default.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ico_dll.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ico_html.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ico_ini.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ico_mov.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ico_music.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ico_pdf.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\NAudio.dll" />
   </ItemGroup>
   <ItemGroup>
@@ -362,6 +354,37 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\ringtone-slow.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\bg_black.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\bg_christmas.jpg" />
+    <Resource Include="Resources\bg_hills.jpg" />
+    <Resource Include="Resources\bg_space.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="IWshRuntimeLibrary">
+      <Guid>{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NSpeex.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Newtonsoft.Json.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\bg_weather_cloudy.jpg" />
+    <Resource Include="Resources\bg_weather_rain.jpg" />
+    <Resource Include="Resources\bg_weather_snow.jpg" />
+    <Resource Include="Resources\bg_weather_sunny.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

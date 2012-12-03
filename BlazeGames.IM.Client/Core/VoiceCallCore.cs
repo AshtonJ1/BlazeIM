@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
-using Audio.Codecs;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using System.IO;
 using System.Media;
 using System.Threading;
+using BlazeGames.Networking;
+using BlazeGames.IM.Client.Networking;
+using NSpeex;
 
 namespace BlazeGames.IM.Client
 {
@@ -19,7 +21,7 @@ namespace BlazeGames.IM.Client
 
         public bool SoundInEnabled = true;
 
-        private System.Net.Sockets.Socket UdpSocket;
+        private Socket UdpListener;
         private EndPoint Any;
         private byte[] TmpBuffer = new byte[20480];
 
@@ -27,7 +29,8 @@ namespace BlazeGames.IM.Client
 
         private WaveInEvent SoundIn;
         private WaveOutEvent SoundOut;
-        private BufferedWaveProvider SoundOutProvider;
+        private JitterBufferWaveProvider SoundOutProvider;
+        SpeexEncoder encoder = new SpeexEncoder(BandMode.Wide);
 
         public VoiceCallCore()
         {
@@ -35,7 +38,7 @@ namespace BlazeGames.IM.Client
 
             Any = new IPEndPoint(IPAddress.Any, UDPPort);
 
-            SoundOutProvider = new BufferedWaveProvider(new WaveFormat(48000, 1));
+            SoundOutProvider = new JitterBufferWaveProvider();
 
             SoundOut = new WaveOutEvent();
             SoundOut.Init(SoundOutProvider);
@@ -44,17 +47,19 @@ namespace BlazeGames.IM.Client
             try
             {
                 SoundIn = new WaveInEvent();
-                SoundIn.WaveFormat = new WaveFormat(48000, 1);
+                SoundIn.WaveFormat = new WaveFormat(encoder.FrameSize * 50, 16, 1);
                 SoundIn.DataAvailable += SoundIn_DataAvailable;
-                SoundIn.BufferMilliseconds = 100;
-                SoundIn.StartRecording();
+                SoundIn.BufferMilliseconds = 40;
+                //SoundIn.StartRecording();
             }
             catch { SoundInEnabled = false; }
 
-            UdpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            UdpSocket.Bind(new IPEndPoint(IPAddress.Any, UDPPort));
+            UdpListener = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            //UdpListener.SendTo(new byte[] { 0x0 }, new IPEndPoint(IPAddress.Broadcast, UDPPort));
+            UdpListener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            UdpListener.Bind(new IPEndPoint(IPAddress.Any, UDPPort));
 
-            UdpSocket.BeginReceiveFrom(TmpBuffer, 0, 20480, SocketFlags.None, ref Any, DoReceiveFrom, null);
+            UdpListener.BeginReceiveFrom(TmpBuffer, 0, 20480, SocketFlags.None, ref Any, DoReceiveFrom, null);
             
         }
 
@@ -67,9 +72,17 @@ namespace BlazeGames.IM.Client
                 if (MemberID == CurrentCalls[call_ep].MemberID)
                 {
                     Console.WriteLine("Ending Call With " + call_ep.ToString());
+                    CurrentCalls[call_ep].Dispose();
                     CurrentCalls.Remove(call_ep);
                 }
             }
+
+            if (CurrentCalls.Count <= 0)
+                try
+                {
+                    SoundIn.StopRecording();
+                }
+                catch { }
         }
 
         public void StartCall(int MemberID, IPEndPoint ep)
@@ -77,11 +90,19 @@ namespace BlazeGames.IM.Client
             if (CurrentCalls.ContainsKey(ep))
             {
                 Console.WriteLine("Ending Call With " + ep.ToString());
+                CurrentCalls[ep].Dispose();
                 CurrentCalls.Remove(ep);
             }
 
             Console.WriteLine("Starting Call With " + ep.ToString());
-            CurrentCalls.Add(ep, new Call { MemberID = MemberID, Address = ep, UdpSocket = UdpSocket });
+            CurrentCalls.Add(ep, new Call(ep) { MemberID = MemberID, UdpListener = UdpListener });
+
+            if (CurrentCalls.Count > 0)
+                try
+                {
+                    SoundIn.StartRecording();
+                }
+                catch { }
         }
 
         private short ComplementToSigned(ref byte[] bytArr, int intPos)
@@ -138,11 +159,9 @@ namespace BlazeGames.IM.Client
                     snd = ComplementToSigned(ref arrfile, j);
                 }
                 byte[] newval = SignedToComplement(snd);
-                if ((newval[0] != null) && (newval[1] != null))
-                {
-                    arrfile[j] = newval[0];
-                    arrfile[j + 1] = newval[1];
-                }
+
+                arrfile[j] = newval[0];
+                arrfile[j + 1] = newval[1];
             }
 
             return arrfile;
@@ -150,13 +169,27 @@ namespace BlazeGames.IM.Client
 
         private void SoundIn_DataAvailable(object sender, WaveInEventArgs e)
         {
-            byte[] Loud = ChangeVolume(e.Buffer, true, 50);    // 50% Increase
-            Call[] tmpcalls = CurrentCalls.Values.ToArray();
+            if (CurrentCalls.Count <= 0)
+                return;
 
-            foreach (Call call in tmpcalls)
+            short[] data = new short[e.BytesRecorded / 2];
+            Buffer.BlockCopy(e.Buffer, 0, data, 0, e.BytesRecorded);
+            var encodedData = new byte[e.BytesRecorded];
+            var encodedBytes = encoder.Encode(data, 0, data.Length, encodedData, 0, encodedData.Length);
+            if (encodedBytes != 0)
             {
-                call.SendData(Loud);
+                var upstreamFrame = new byte[encodedBytes];
+                Array.Copy(encodedData, upstreamFrame, encodedBytes);
+
+                //SoundOutProvider.Write(upstreamFrame, 0, upstreamFrame.Length);
+
+                Call[] tmpcalls = CurrentCalls.Values.ToArray();
+
+                foreach (Call call in tmpcalls)
+                    call.SendData(upstreamFrame);
             }
+
+            //byte[] Loud = ChangeVolume(e.Buffer, true, 50);    // 50% Increase
         }
 
         private void DoReceiveFrom(IAsyncResult iar)
@@ -165,11 +198,11 @@ namespace BlazeGames.IM.Client
             {
                 EndPoint RemoteEP = new IPEndPoint(IPAddress.Any, UDPPort);
 
-                int ReceivedLen = UdpSocket.EndReceiveFrom(iar, ref RemoteEP);
+                int ReceivedLen = UdpListener.EndReceiveFrom(iar, ref RemoteEP);
                 byte[] Data = new Byte[ReceivedLen];
                 Array.Copy(TmpBuffer, Data, ReceivedLen);
 
-                UdpSocket.BeginReceiveFrom(TmpBuffer, 0, 20480, SocketFlags.None, ref Any, DoReceiveFrom, null);
+                UdpListener.BeginReceiveFrom(TmpBuffer, 0, 20480, SocketFlags.None, ref Any, DoReceiveFrom, null);
 
                 if (CurrentCalls.ContainsKey((IPEndPoint)RemoteEP))
                 {
@@ -179,47 +212,48 @@ namespace BlazeGames.IM.Client
             catch
             {
                 CurrentCalls.Clear();
-                UdpSocket.Dispose();
+                UdpListener.Dispose();
 
-                UdpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                UdpSocket.Bind(new IPEndPoint(IPAddress.Any, UDPPort));
+                UdpListener = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                UdpListener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                UdpListener.Bind(new IPEndPoint(IPAddress.Any, UDPPort));
 
-                UdpSocket.BeginReceiveFrom(TmpBuffer, 0, 20480, SocketFlags.None, ref Any, DoReceiveFrom, null); 
+                UdpListener.BeginReceiveFrom(TmpBuffer, 0, 20480, SocketFlags.None, ref Any, DoReceiveFrom, null); 
             }
         }
     }
 
-    internal class Call
+    internal class Call : IDisposable
     {
+        public UdpClient UdpSender;
+        public Socket UdpListener;
+
         public bool Calling = true;
 
         public int MemberID;
 
         public IPEndPoint Address;
-        public Socket UdpSocket;
         public bool SoundInMuted = false;
         public bool SoundOutMuted = false;
 
         private WaveOutEvent SoundOut;
-        private BufferedWaveProvider SoundOutProvider;
 
-        private OpusEncoder _encoder;
-        private OpusDecoder _decoder;
-        private int _segmentFrames;
-        private int _bytesPerSegment;
+        private SpeexEncoder _encoder;
+        private JitterBufferWaveProvider SpeexProvider;
 
-        public Call()
+        public Call(IPEndPoint Address)
         {
-            _segmentFrames = 960;
-            _encoder = OpusEncoder.Create(48000, 1, Audio.Codecs.Opus.Application.Voip, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BlazeGamesIM", "Codecs"));
-            _encoder.Bitrate = 8192;
-            _decoder = OpusDecoder.Create(48000, 1, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BlazeGamesIM", "Codecs"));
-            _bytesPerSegment = _encoder.FrameByteCount(_segmentFrames);
+            UdpSender = new UdpClient();
+            UdpSender.Connect(Address);
+            this.Address = Address;
 
-            SoundOutProvider = new BufferedWaveProvider(new WaveFormat(48000, 1));
+            _encoder = new SpeexEncoder(BandMode.Wide);
+            SpeexProvider = new JitterBufferWaveProvider();
+
+            
 
             SoundOut = new WaveOutEvent();
-            SoundOut.Init(SoundOutProvider);
+            SoundOut.Init(SpeexProvider);
             SoundOut.Play();
         }
 
@@ -230,37 +264,7 @@ namespace BlazeGames.IM.Client
                     return;
                 else
                 {
-                    byte[] soundBuffer = new byte[data.Length + _notEncodedBuffer.Length];
-                    for (int i = 0; i < _notEncodedBuffer.Length; i++)
-                        soundBuffer[i] = _notEncodedBuffer[i];
-                    for (int i = 0; i < data.Length; i++)
-                        soundBuffer[i + _notEncodedBuffer.Length] = data[i];
-
-                    int byteCap = _bytesPerSegment;
-                    int segmentCount = (int)Math.Floor((decimal)soundBuffer.Length / byteCap);
-                    int segmentsEnd = segmentCount * byteCap;
-                    int notEncodedCount = soundBuffer.Length - segmentsEnd;
-                    _notEncodedBuffer = new byte[notEncodedCount];
-                    for (int i = 0; i < notEncodedCount; i++)
-                    {
-                        _notEncodedBuffer[i] = soundBuffer[segmentsEnd + i];
-                    }
-
-                    for (int i = 0; i < segmentCount; i++)
-                    {
-                        byte[] segment = new byte[byteCap];
-                        for (int j = 0; j < segment.Length; j++)
-                            segment[j] = soundBuffer[(i * byteCap) + j];
-
-                        int len;
-                        byte[] buff = _encoder.Encode(segment, segment.Length, out len);
-
-                        try
-                        {
-                            UdpSocket.SendTo(buff, len, SocketFlags.None, Address);
-                        }
-                        catch { }
-                    }
+	                UdpListener.SendTo(data, data.Length, SocketFlags.None, Address);
                 }
         }
 
@@ -270,11 +274,130 @@ namespace BlazeGames.IM.Client
                 return;
             else
             {
-                int length;
-                byte[] buff = _decoder.Decode(data, data.Length, out length);
-
-                SoundOutProvider.AddSamples(buff, 0, length);
+                SpeexProvider.Write(data, 0, data.Length);
+                Console.Write("*");
             }
         }
+
+        /* GC */
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                SoundOut.Dispose();
+                SpeexProvider.Dispose();
+            }
+        }
+    }
+
+    public class VolumeUpdatedEventArgs : EventArgs
+    {
+        public int Volume { get; set; }
+    }
+
+    public class JitterBufferWaveProvider : WaveStream
+    {
+        private readonly SpeexDecoder decoder = new SpeexDecoder(BandMode.Narrow);
+        private readonly SpeexJitterBuffer jitterBuffer;
+
+        //private readonly NativeDecoder decoder = new NativeDecoder((EncodingMode)1);
+        //private readonly NativeJitterBuffer jitterBuffer;
+
+        private readonly WaveFormat waveFormat;
+        private readonly object readWriteLock = new object();
+
+        public JitterBufferWaveProvider()
+        {
+            waveFormat = new WaveFormat(decoder.FrameSize * 50, 16, 1);
+            jitterBuffer = new SpeexJitterBuffer(decoder);
+            //jitterBuffer = new NativeJitterBuffer(decoder);
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            int peakVolume = 0;
+            int bytesRead = 0;
+            lock (readWriteLock)
+            {
+                while (bytesRead < count)
+                {
+                    if (exceedingBytes.Count != 0)
+                    {
+                        buffer[bytesRead++] = exceedingBytes.Dequeue();
+                    }
+                    else
+                    {
+                        short[] decodedBuffer = new short[decoder.FrameSize * 2];
+                        jitterBuffer.Get(decodedBuffer);
+                        for (int i = 0; i < decodedBuffer.Length; ++i)
+                        {
+                            if (bytesRead < count)
+                            {
+                                short currentSample = decodedBuffer[i];
+                                peakVolume = currentSample > peakVolume ? currentSample : peakVolume;
+                                BitConverter.GetBytes(currentSample).CopyTo(buffer, offset + bytesRead);
+                                bytesRead += 2;
+                            }
+                            else
+                            {
+                                var bytes = BitConverter.GetBytes(decodedBuffer[i]);
+                                exceedingBytes.Enqueue(bytes[0]);
+                                exceedingBytes.Enqueue(bytes[1]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            OnVolumeUpdated(peakVolume);
+
+            return bytesRead;
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            lock (readWriteLock)
+            {
+                jitterBuffer.Put(buffer);
+            }
+        }
+
+        public override long Length
+        {
+            get { return 1; }
+        }
+
+        public override long Position
+        {
+            get { return 0; }
+            set { throw new NotImplementedException(); }
+        }
+
+        public override WaveFormat WaveFormat
+        {
+            get
+            {
+                return waveFormat;
+            }
+        }
+
+        public EventHandler<VolumeUpdatedEventArgs> VolumeUpdated;
+
+        private void OnVolumeUpdated(int volume)
+        {
+            var eventHandler = VolumeUpdated;
+            if (eventHandler != null)
+            {
+                eventHandler.BeginInvoke(this, new VolumeUpdatedEventArgs { Volume = volume }, null, null);
+            }
+        }
+
+        private readonly Queue<byte> exceedingBytes = new Queue<byte>();
     }
 }

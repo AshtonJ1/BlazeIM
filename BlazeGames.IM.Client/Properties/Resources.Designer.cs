@@ -102,9 +102,9 @@ namespace BlazeGames.IM.Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] opus {
+        internal static byte[] Newtonsoft_Json {
             get {
-                object obj = ResourceManager.GetObject("opus", resourceCulture);
+                object obj = ResourceManager.GetObject("Newtonsoft_Json", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -112,9 +112,9 @@ namespace BlazeGames.IM.Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] OpusWrapper {
+        internal static byte[] NSpeex {
             get {
-                object obj = ResourceManager.GetObject("OpusWrapper", resourceCulture);
+                object obj = ResourceManager.GetObject("NSpeex", resourceCulture);
                 return ((byte[])(obj));
             }
         }

@@ -29,11 +29,12 @@ namespace BlazeGames.IM.Server.Networking
             //PAK_CLI_GRP_LEAVE       = 0x16,     //  GroupLeave(GroupID)                             *
             //PAK_CLI_GRP_SNDMSG      = 0x17,     //  GroupSendMessage(GroupID, Message)              *
 
-            PAK_CLI_CALL_RQST       = 0x18,     //  CallRequest(MemberID)                           *
-            PAK_CLI_CALL_CNCL       = 0x19,     //  CallCancel(MemberID)                            *
-            PAK_CLI_CALL_ACC        = 0x20,     //  CallAccept(MemberID)                            *
-            PAK_CLI_CALL_DNY        = 0x21,     //  CallDeny(MemberID)                              *
-            PAK_CLI_CALL_END        = 0x22,     //  CallEnd(MemberID)                               *
+            PAK_CLI_CALL_RQST       = 0x18,     //  CallRequest(MemberID)                           
+            PAK_CLI_CALL_CNCL       = 0x19,     //  CallCancel(MemberID)                              *
+            PAK_CLI_CALL_ACC        = 0x20,     //  CallAccept(MemberID)                            
+            PAK_CLI_CALL_DNY        = 0x21,     //  CallDeny(MemberID)                              
+            PAK_CLI_CALL_END        = 0x22,     //  CallEnd(MemberID)                                 *
+            PAK_CLI_VCALL_DATA      = 0x23,     //  VCallData(MemberID)
 
             // PAK_SRV
             PAK_SRV_LGNRESP         = 0x51,     //  LoginResponse(ResponseCode, ID, Nickname, Status)
@@ -50,11 +51,12 @@ namespace BlazeGames.IM.Server.Networking
             //PAK_SRV_GRP_JOINDLVR    = 0x63,     //  GroupJoinDeliver(GroupID, MemID)                *
             //PAK_SRV_GRP_LEAVDLVR    = 0x64,     //  GroupLeaveDeliver(GroupID, MemID)               *
 
-            PAK_SRV_CALL_DLVR       = 0x65,     //  CallDeliver(MemberID, UDPAddress)               *
-            PAK_SRV_CALL_CNCL_DLVR  = 0x66,     //  CallCancelDeliver(MemberID)                     *
-            PAK_SRV_CALL_ACC_DLVR   = 0x67,     //  CallAcceptDeliver(MemberID, UDPAddress)         *
-            PAK_SRV_CALL_DNY_DLVR   = 0x68,     //  CallDenyDeliver(MemberID)                       *
-            PAK_SRV_CALL_END_DLVR   = 0x69;     //  CallEndDeliver(MemberID)                        *
+            PAK_SRV_CALL_DLVR       = 0x65,     //  CallDeliver(MemberID, UDPAddress)               
+            PAK_SRV_CALL_CNCL_DLVR  = 0x66,     //  CallCancelDeliver(MemberID)                       *
+            PAK_SRV_CALL_ACC_DLVR   = 0x67,     //  CallAcceptDeliver(MemberID, UDPAddress)         
+            PAK_SRV_CALL_DNY_DLVR   = 0x68,     //  CallDenyDeliver(MemberID)                       
+            PAK_SRV_CALL_END_DLVR   = 0x69,     //  CallEndDeliver(MemberID)                          *
+            PAK_SRV_VCALL_DATA_DLVR = 0x70;     //  VCallDataDeliver
     }
 
     class PacketHandlers
@@ -94,7 +96,7 @@ namespace BlazeGames.IM.Server.Networking
 
                     ServerSocket.Instance.MemberConnections.Add(mem.ID, conn);
 
-                    conn.SendPacket(Packet.New(Packets.PAK_SRV_LGNRESP, true, Nickname, mem.MemberData));
+                    conn.SendPacket(Packet.New(Packets.PAK_SRV_LGNRESP, true, Nickname, mem.MemberData, mem.FirstName + " " + mem.LastName, mem.ID, mem.IsPremiumIM, mem.NameFontColor, mem.StatusFontColor));
                 }
             }
 
@@ -159,6 +161,11 @@ namespace BlazeGames.IM.Server.Networking
                         pak2.Write(member.Authority);
                         pak2.Write(member.StatusCode);
                         pak2.Write(mem.PendingFriends.Contains(MemberID.ToString()));
+                        pak2.Write(member.FirstName);
+                        pak2.Write(member.LastName);
+                        pak2.Write(member.IsPremiumIM);
+                        pak2.Write(member.NameFontColor);
+                        pak2.Write(member.StatusFontColor);
                     }
                     else
                         pak2.Write(false);
@@ -268,6 +275,11 @@ namespace BlazeGames.IM.Server.Networking
                         pak2.Write(member2.Authority);
                         pak2.Write(member2.StatusCode);
                         pak2.Write(false);
+                        pak2.Write(member2.FirstName);
+                        pak2.Write(member2.LastName);
+                        pak2.Write(member2.IsPremiumIM);
+                        pak2.Write(member2.NameFontColor);
+                        pak2.Write(member2.StatusFontColor);
                     }
                     else
                         pak2.Write(false);
@@ -290,6 +302,11 @@ namespace BlazeGames.IM.Server.Networking
                             pak3.Write(member1.Authority);
                             pak3.Write(member1.StatusCode);
                             pak3.Write(false);
+                            pak3.Write(member1.FirstName);
+                            pak3.Write(member1.LastName);
+                            pak3.Write(member1.IsPremiumIM);
+                            pak3.Write(member1.NameFontColor);
+                            pak3.Write(member1.StatusFontColor);
                         }
                         else
                             pak3.Write(false);
@@ -319,6 +336,11 @@ namespace BlazeGames.IM.Server.Networking
                             pak2.Write(member1.Authority);
                             pak2.Write(member1.StatusCode);
                             pak2.Write(true);
+                            pak2.Write(member1.FirstName);
+                            pak2.Write(member1.LastName);
+                            pak2.Write(member1.IsPremiumIM);
+                            pak2.Write(member1.NameFontColor);
+                            pak2.Write(member1.StatusFontColor);
                         }
                         else
                             pak2.Write(false);

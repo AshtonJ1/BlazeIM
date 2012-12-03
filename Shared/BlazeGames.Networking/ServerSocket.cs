@@ -21,7 +21,7 @@ namespace BlazeGames.Networking
 
         public List<SocketConnection> SocketConnections = new List<SocketConnection>();
         public Dictionary<int, SocketConnection> MemberConnections = new Dictionary<int, SocketConnection>();
-        public System.Net.Sockets.Socket RawSocket;
+        public Socket RawSocket;
 
         public long
             PacketsReceived = 0,

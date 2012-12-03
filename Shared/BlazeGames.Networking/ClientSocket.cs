@@ -41,7 +41,7 @@ namespace BlazeGames.Networking
         /// <summary>
         /// The raw System.Net.Sockets.Socket of the client
         /// </summary>
-        public System.Net.Sockets.Socket RawSocket;
+        public Socket RawSocket;
         private byte[] ReceiveBuffer = new byte[Packet.MaxLength];
         private IPEndPoint EP;
 
@@ -49,9 +49,17 @@ namespace BlazeGames.Networking
         /// Created a new client connection
         /// </summary>
         /// <param name="EP">The IPEndpoint to connect to</param>
+        /// <param name="ProxyType">The the SOCKS proxy type to use to connect</param>
         public ClientSocket(IPEndPoint EP)
         {
             RawSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            /*if (ProxyType != ProxyTypes.None)
+            {
+                RawSocket.ProxyEndPoint = ProxyEndpoint;
+                RawSocket.ProxyType = ProxyType;
+            }
+            else
+                RawSocket.ProxyType = ProxyTypes.None;*/
             this.EP = EP;
         }
 
@@ -63,6 +71,13 @@ namespace BlazeGames.Networking
         public ClientSocket(IPAddress IP, int Port)
         {
             RawSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            /*if (ProxyType != ProxyTypes.None)
+            {
+                RawSocket.ProxyEndPoint = ProxyEndpoint;
+                RawSocket.ProxyType = ProxyType;
+            }
+            else
+                RawSocket.ProxyType = ProxyTypes.None;*/
             this.EP = new IPEndPoint(IP, Port);
         }
 

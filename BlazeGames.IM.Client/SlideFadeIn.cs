@@ -92,7 +92,7 @@ namespace BlazeGames.IM.Client
             //  Create an animation for the slide in.
             var slideInAnimation = new DoubleAnimation() { From = MainWindow.Instance.Width, To = 70, Duration = new Duration(TimeSpan.FromMilliseconds(1000)) };
             slideInAnimation.EasingFunction = new CubicEase() { EasingMode = EasingMode.EaseInOut };
-            var slideOverAnimation = new DoubleAnimation() { From = MainWindow.Instance.Left, To = SystemParameters.PrimaryScreenWidth - 70, Duration = new Duration(TimeSpan.FromMilliseconds(1000)) };
+            var slideOverAnimation = new DoubleAnimation() { From = MainWindow.Instance.Left, To = SystemParameters.WorkArea.Width - 70, Duration = new Duration(TimeSpan.FromMilliseconds(1000)) };
             slideOverAnimation.EasingFunction = new CubicEase() { EasingMode = EasingMode.EaseInOut };
             var slideUpAnimation = new DoubleAnimation() { From = MainWindow.Instance.Top, To = 0, Duration = new Duration(TimeSpan.FromMilliseconds(1000)) };
             slideUpAnimation.EasingFunction = new CubicEase() { EasingMode = EasingMode.EaseInOut };

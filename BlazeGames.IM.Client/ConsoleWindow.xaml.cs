@@ -69,7 +69,7 @@ namespace BlazeGames.IM.Client
             get
             {
                 return
-                    Encoding.Default;
+                    Encoding.UTF8;
             }
         }
 

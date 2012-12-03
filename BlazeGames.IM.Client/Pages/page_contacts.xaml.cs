@@ -60,13 +60,13 @@ namespace BlazeGames.IM.Client
                         int i = 0;
                         int j = 0;
 
-                        Dictionary<int, Contact> sorted_friends = (from entry in App.Instance.Contacts orderby entry.Value.NickName ascending select entry).ToDictionary(pair => pair.Key, pair => pair.Value);
+                        Dictionary<int, Contact> sorted_friends = (from entry in App.Instance.Contacts orderby entry.Value.FullName ascending select entry).ToDictionary(pair => pair.Key, pair => pair.Value);
 
                         foreach (Contact contact in sorted_friends.Values)
                         {
                             if (contact.status == Status.Online)
                             {
-                                if (MainWindow.Instance.txt_search.Text != "" && !contact.NickName.ToLower().Contains(MainWindow.Instance.txt_search.Text.ToLower()) && !contact.StatusUpdate.ToLower().Contains(MainWindow.Instance.txt_search.Text.ToLower()))
+                                if (MainWindow.Instance.txt_search.Text != "" && !contact.FullName.ToLower().Contains(MainWindow.Instance.txt_search.Text.ToLower()) && !contact.StatusUpdate.ToLower().Contains(MainWindow.Instance.txt_search.Text.ToLower()))
                                 {
                                     contact.control.Visibility = System.Windows.Visibility.Collapsed;
                                     controls_to_remove.Remove(contact.control);
@@ -110,7 +110,7 @@ namespace BlazeGames.IM.Client
                         {
                             if (contact.status == Status.Busy)
                             {
-                                if (MainWindow.Instance.txt_search.Text != "" && !contact.NickName.ToLower().Contains(MainWindow.Instance.txt_search.Text.ToLower()) && !contact.StatusUpdate.ToLower().Contains(MainWindow.Instance.txt_search.Text.ToLower()))
+                                if (MainWindow.Instance.txt_search.Text != "" && !contact.FullName.ToLower().Contains(MainWindow.Instance.txt_search.Text.ToLower()) && !contact.StatusUpdate.ToLower().Contains(MainWindow.Instance.txt_search.Text.ToLower()))
                                 {
                                     contact.control.Visibility = System.Windows.Visibility.Collapsed;
                                     controls_to_remove.Remove(contact.control);
@@ -154,7 +154,7 @@ namespace BlazeGames.IM.Client
                         { 
                             if (contact.status == Status.Away || contact.status == Status.Afk)
                             {
-                                if (MainWindow.Instance.txt_search.Text != "" && !contact.NickName.ToLower().Contains(MainWindow.Instance.txt_search.Text.ToLower()) && !contact.StatusUpdate.ToLower().Contains(MainWindow.Instance.txt_search.Text.ToLower()))
+                                if (MainWindow.Instance.txt_search.Text != "" && !contact.FullName.ToLower().Contains(MainWindow.Instance.txt_search.Text.ToLower()) && !contact.StatusUpdate.ToLower().Contains(MainWindow.Instance.txt_search.Text.ToLower()))
                                 {
                                     contact.control.Visibility = System.Windows.Visibility.Collapsed;
                                     controls_to_remove.Remove(contact.control);
@@ -198,7 +198,7 @@ namespace BlazeGames.IM.Client
                         {
                             if (contact.status == Status.Offline)
                             {
-                                if (MainWindow.Instance.txt_search.Text != "" && !contact.NickName.ToLower().Contains(MainWindow.Instance.txt_search.Text.ToLower()) && !contact.StatusUpdate.ToLower().Contains(MainWindow.Instance.txt_search.Text.ToLower()))
+                                if (MainWindow.Instance.txt_search.Text != "" && !contact.FullName.ToLower().Contains(MainWindow.Instance.txt_search.Text.ToLower()) && !contact.StatusUpdate.ToLower().Contains(MainWindow.Instance.txt_search.Text.ToLower()))
                                 {
                                     contact.control.Visibility = System.Windows.Visibility.Collapsed;
                                     controls_to_remove.Remove(contact.control);
@@ -239,7 +239,7 @@ namespace BlazeGames.IM.Client
                             }
                         }
 
-                        if (ContactCount == 1 && MainWindow.Instance.txt_search.Text != "" && MainWindow.Instance.txt_search.Text.ToLower() == LastContact.NickName.ToLower())
+                        if (ContactCount == 1 && MainWindow.Instance.txt_search.Text != "" && MainWindow.Instance.txt_search.Text.ToLower() == LastContact.FullName.ToLower())
                         {
                             if (!LastContact.Pending)
                             {
@@ -276,8 +276,6 @@ namespace BlazeGames.IM.Client
 
                     foreach (Control_Contact control in controls_to_remove)
                         page_canvas.Children.Remove(control);
-
-                    SlideFade.StartAnimationIn(this);
 
                     
                 }, null);

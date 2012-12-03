@@ -20,7 +20,6 @@ using System.Diagnostics;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using System.Runtime.InteropServices;
-using Audio.Codecs;
 
 namespace BlazeGames.IM.Client
 {
@@ -41,7 +40,7 @@ namespace BlazeGames.IM.Client
 
         public string MD5Hash = "";
 
-        public static string Account, Password, NickName;
+        public static string Account, Password, NickName, FullName;
         private static Status _CurrentStatus;
         public static Status CurrentStatus
         {
@@ -56,11 +55,47 @@ namespace BlazeGames.IM.Client
 
         public App()
         {
-            /*if (ApplicationRunningHelper.AlreadyRunning())
+            FileInfo StartupFile = new FileInfo(Process.GetCurrentProcess().MainModule.FileName);
+
+            //Install the app
+            string StartupLink = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "Blaze IM.lnk");
+            string StartMenuLink = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Blaze IM.lnk");
+            string AppdataLink = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BlazeGamesIM", "BlazeIM.exe");
+
+            if (AppdataLink != StartupFile.FullName && !StartupFile.Name.Contains("vshost"))
+            {
+                try
+                {
+                    if (File.Exists(StartupLink))
+                        File.Delete(StartupLink);
+                    if (File.Exists(StartMenuLink))
+                        File.Delete(StartMenuLink);
+                    if (File.Exists(AppdataLink))
+                        File.Delete(AppdataLink);
+
+                    File.Copy(StartupFile.FullName, AppdataLink);
+
+                    IWshRuntimeLibrary.WshShell shell = new IWshRuntimeLibrary.WshShell();
+                    IWshRuntimeLibrary.IWshShortcut StartMenuShortcut;
+                    StartMenuShortcut = (IWshRuntimeLibrary.IWshShortcut)shell.CreateShortcut(StartMenuLink);
+                    StartMenuShortcut.TargetPath = AppdataLink;
+                    StartMenuShortcut.Description = "Launch Blaze IM";
+                    StartMenuShortcut.Save();
+
+                    IWshRuntimeLibrary.IWshShortcut StartupShortcut;
+                    StartupShortcut = (IWshRuntimeLibrary.IWshShortcut)shell.CreateShortcut(StartupLink);
+                    StartupShortcut.TargetPath = AppdataLink;
+                    StartupShortcut.Description = "Launch Blaze IM";
+                    StartupShortcut.Save();
+                }
+                catch { }
+            }
+
+            if (ApplicationRunningHelper.AlreadyRunning() && !StartupFile.Name.Contains("vshost"))
             {
                 Application.Current.Shutdown();
                 return;
-            }*/  
+            }
 
             if (ConfigManager.Instance.GetBool("indev", false))
             {
@@ -80,22 +115,25 @@ namespace BlazeGames.IM.Client
             if (!chatlogs_di.Exists)
                 chatlogs_di.Create();
 
-            FileInfo opuscodec_fi = new FileInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BlazeGamesIM", "Codecs", "opus.dll"));
-            if (!opuscodec_fi.Directory.Exists)
-                opuscodec_fi.Directory.Create();
-            if (!opuscodec_fi.Exists)
-                File.WriteAllBytes(opuscodec_fi.FullName, BlazeGames.IM.Client.Properties.Resources.opus);
-
             try
             {
-                FileInfo fi = new FileInfo(Process.GetCurrentProcess().MainModule.FileName);
-                if (!fi.Name.Contains("vshost"))
+                if (!StartupFile.Name.Contains("vshost"))
                 {
-                    byte[] file_data = File.ReadAllBytes(fi.FullName);
+                    byte[] file_data = File.ReadAllBytes(StartupFile.FullName);
                     MD5Hash = BlazeGames.IM.Client.Core.Utilities.MD5(file_data);
                 }
             }
             catch { }
+
+            WeatherApi weatherApi = new WeatherApi("Caldwell Idaho");
+            weatherApi.WeatherDataUpdated += weatherApi_WeatherDataUpdated;
+        }
+
+        void weatherApi_WeatherDataUpdated(object sender, WeatherData e)
+        {
+            Console.WriteLine("Temperature: {0}F", Math.Round(e.list[0].main.temp_F, 0));
+            foreach(WeatherDataCityWeather Weather in e.list[0].weather)
+                Console.WriteLine("Condition: {0}", Weather.Condition);
         }
 
         void UpdateCheckTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -130,7 +168,8 @@ namespace BlazeGames.IM.Client
         static Assembly interactivity = Assembly.Load(BlazeGames.IM.Client.Properties.Resources.System_Windows_Interactivity);
         static Assembly fluidkit = Assembly.Load(BlazeGames.IM.Client.Properties.Resources.FluidKit);
         static Assembly naudio = Assembly.Load(BlazeGames.IM.Client.Properties.Resources.NAudio);
-        static Assembly opuswrapper = Assembly.Load(BlazeGames.IM.Client.Properties.Resources.OpusWrapper);
+        static Assembly nspeex = Assembly.Load(BlazeGames.IM.Client.Properties.Resources.NSpeex);
+        static Assembly newtonsoftjson = Assembly.Load(BlazeGames.IM.Client.Properties.Resources.Newtonsoft_Json);
 
         static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
@@ -144,7 +183,8 @@ namespace BlazeGames.IM.Client
                 case "system.windows.interactivity": return interactivity;
                 case "fluidkit": return fluidkit;
                 case "naudio": return naudio;
-                case "opuswrapper": return opuswrapper;
+                case "nspeex": return nspeex;
+                case "newtonsoft.json": return newtonsoftjson;
                 default:
                     Console.WriteLine("Failed To Load: {0}", args.Name);
                     return null;
@@ -159,15 +199,19 @@ namespace BlazeGames.IM.Client
             {
                 string nickname = pak.Readstring();
                 string StatusUpdate = pak.Readstring();
+                string FullName = pak.Readstring();
+
                 clientSocket.SendPacket(Packet.New(Packets.PAK_CLI_FRNDLSTRQST));
                 this.Dispatcher.Invoke((MethodInvoker)delegate
                 {
                     Account = BlazeGames.IM.Client.MainWindow.Instance.page_Login.txt_account.Text;
                     Password = BlazeGames.IM.Client.MainWindow.Instance.page_Login.txt_password.Password;
                     NickName = nickname;
+                    App.FullName = FullName;
 
                     BlazeGames.IM.Client.MainWindow.Instance.page_Login.txt_loading.Content = "Fetching Your Contacts";
                     BlazeGames.IM.Client.MainWindow.Instance.txt_nickname.Text = nickname;
+                    //BlazeGames.IM.Client.MainWindow.Instance.txt_nickname.Effect = new System.Windows.Media.Effects.BlurEffect();
                     BlazeGames.IM.Client.MainWindow.Instance.txt_status.Text = StatusUpdate;
                     CurrentStatus = Status.Online;
 
@@ -257,43 +301,46 @@ namespace BlazeGames.IM.Client
         {
             this.Dispatcher.Invoke((MethodInvoker)delegate
             {
-                ReceivedFriendCount++;
+                    ReceivedFriendCount++;
 
-                if (pak.Readbool())
-                {
-                    int MemberID = pak.Readint();
-                    string MemberNickname = pak.Readstring();
-                    string MemberStatus = pak.Readstring();
-                    int MemberAuth = pak.Readint();
-                    byte StatusCode = pak.Readbyte();
-                    bool PendingRequest = pak.Readbool();
-
-                    if (!Contacts.ContainsKey(MemberID))
-                        Contacts.Add(MemberID, new Contact(MemberID, MemberNickname, PendingRequest, (Status)StatusCode, MemberStatus, MemberAuth));
-                    else
+                    if (pak.Readbool())
                     {
-                        Contact contact = Contacts[MemberID];
+                        int MemberID = pak.Readint();
+                        string MemberNickname = pak.Readstring();
+                        string MemberStatus = pak.Readstring();
+                        int MemberAuth = pak.Readint();
+                        byte StatusCode = pak.Readbyte();
+                        bool PendingRequest = pak.Readbool();
+                        string FirstName = pak.Readstring();
+                        string LastName = pak.Readstring();
 
-                        contact.NickName = MemberNickname;
-                        contact.StatusUpdate = MemberStatus;
-                        contact.Authority = MemberAuth;
-                        contact.status = (Status)StatusCode;
-                        contact.Pending = PendingRequest;
+                        if (!Contacts.ContainsKey(MemberID))
+                            Contacts.Add(MemberID, new Contact(MemberID, MemberNickname, FirstName, LastName, PendingRequest, (Status)StatusCode, MemberStatus, MemberAuth));
+                        else
+                        {
+                            Contact contact = Contacts[MemberID];
 
-                        
+                            contact.NickName = MemberNickname;
+                            contact.StatusUpdate = MemberStatus;
+                            contact.Authority = MemberAuth;
+                            contact.status = (Status)StatusCode;
+                            contact.Pending = PendingRequest;
+                            contact.FirstName = FirstName;
+                            contact.LastName = LastName;
+                            contact.FullName = FirstName + " " + LastName;
+                        }
+
+                        if (PendingRequest && ConfigManager.Instance.GetBool("txt_newrequestnotification", true) && ConfigManager.Instance.GetBool("txt_notifications", true))
+                        {
+                            NotificationWindow.ShowNotification("Pending Contact", String.Format("{0} has requested you be added to their contact list.", MemberNickname));
+                        }
+
+                        if (ReceivedFriendCount >= FriendCount)
+                            BlazeGames.IM.Client.MainWindow.Instance.page_Contacts.Draw();
                     }
 
-                    if (PendingRequest && ConfigManager.Instance.GetBool("txt_newrequestnotification", true) && ConfigManager.Instance.GetBool("txt_notifications", true))
-                    {
-                        NotificationWindow.ShowNotification("Pending Contact", String.Format("{0} has requested you be added to their contact list.", MemberNickname));
-                    }
-
-                    if (ReceivedFriendCount >= FriendCount)
-                        BlazeGames.IM.Client.MainWindow.Instance.page_Contacts.Draw();
-                }
-
-                if (ReceivedFriendCount == FriendCount)
-                    clientSocket.SendPacket(Packet.New(Packets.PAK_CLI_OFFLNMSGRQST));
+                    if (ReceivedFriendCount == FriendCount)
+                        clientSocket.SendPacket(Packet.New(Packets.PAK_CLI_OFFLNMSGRQST));
             }, null);
         }
 
@@ -306,7 +353,7 @@ namespace BlazeGames.IM.Client
 
                 if(BlazeGames.IM.Client.MainWindow.Instance.page_Chat.ChattingWith != null)
                     if (BlazeGames.IM.Client.MainWindow.Instance.page_Chat.ChattingWith.ID == FromMemberID)
-                        BlazeGames.IM.Client.MainWindow.Instance.page_Chat.HandleMessage(Contacts[FromMemberID].NickName, Message);
+                        BlazeGames.IM.Client.MainWindow.Instance.page_Chat.HandleMessage(Contacts[FromMemberID].FullName, Message);
 
                 Contacts[FromMemberID].ReceiveNewMessage(Message);
             }, null);
@@ -321,11 +368,11 @@ namespace BlazeGames.IM.Client
                 Contact contact = Contacts[MemberID];
 
                 if (contact.status == Status.Offline && NewStatus != Status.Offline && ConfigManager.Instance.GetBool("txt_loginnotification", true) && ConfigManager.Instance.GetBool("txt_notifications", true))
-                    NotificationWindow.ShowNotification(String.Format("{0} Has Signed In", contact.NickName), String.Format("{0} has just signed in.", contact.NickName), contact);
+                    NotificationWindow.ShowNotification(String.Format("{0} Has Signed In", contact.FullName), String.Format("{0} has just signed in.", contact.FullName), contact);
                 if (contact.status != Status.Offline && NewStatus == Status.Offline && ConfigManager.Instance.GetBool("txt_logoutnotification", true) && ConfigManager.Instance.GetBool("txt_notifications", true))
                 {
                     VCallCore.EndCall(contact.ID);
-                    NotificationWindow.ShowNotification(String.Format("{0} Has Signed Out", contact.NickName), String.Format("{0} has just signed out.", contact.NickName), contact);
+                    NotificationWindow.ShowNotification(String.Format("{0} Has Signed Out", contact.FullName), String.Format("{0} has just signed out.", contact.FullName), contact);
                 }
 
                 contact.status = NewStatus;
@@ -410,7 +457,7 @@ namespace BlazeGames.IM.Client
             CSocket.ClientSocketPacketReceived_Event += new ClientSocketPacketReceived_Handler(CSocket_ClientSocketPacketReceived_Event);
             CSocket.ClientSocketConnected_Event += new EventHandler(CSocket_ClientSocketConnected_Event);
             CSocket.ClientSocketDisconnected_Event += new EventHandler(CSocket_ClientSocketDisconnected_Event);
-            CSocket.Connect();
+            //CSocket.Connect();
 
             int InitalizeTick = Environment.TickCount & Int32.MaxValue;
 
@@ -451,7 +498,7 @@ namespace BlazeGames.IM.Client
             }, null);
         }
 
-        void CSocket_ClientSocketDisconnected_Event(object sender, EventArgs e)
+        public void CSocket_ClientSocketDisconnected_Event(object sender, EventArgs e)
         {
             App.Instance.Dispatcher.Invoke((MethodInvoker)delegate
             {
@@ -481,6 +528,7 @@ namespace BlazeGames.IM.Client
                 App.Account = "";
                 App.Password = "";
                 App.NickName = "";
+                App.FullName = "";
                 App.Instance.Contacts.Clear();
 
                 BlazeGames.IM.Client.MainWindow.Instance.page_Login.Visibility = Visibility.Visible;
@@ -494,7 +542,7 @@ namespace BlazeGames.IM.Client
             
         }
 
-        void CSocket_ClientSocketConnected_Event(object sender, EventArgs e)
+        public void CSocket_ClientSocketConnected_Event(object sender, EventArgs e)
         {
             
         }
@@ -616,7 +664,7 @@ namespace BlazeGames.IM.Client
         /// <param name="status">The contacts current status</param>
         /// <param name="StatusUpdate">The contacts status message</param>
         /// <param name="NewMessages">The new message count for the contact</param>
-        public Contact(int ID, string NickName, bool Pending = false, Status status = Status.Offline, string StatusUpdate = "", int Authority = 1, int NewMessages = 0)
+        public Contact(int ID, string NickName, string FirstName, string LastName, bool Pending = false, Status status = Status.Offline, string StatusUpdate = "", int Authority = 1, int NewMessages = 0)
         {
             this.ID = ID;
             this.Authority = Authority;
@@ -628,6 +676,9 @@ namespace BlazeGames.IM.Client
             this.LastMessage = DateTime.Now;
             this.Pending = Pending;
             this.CallActive = false;
+            this.FirstName = FirstName;
+            this.LastName = LastName;
+            this.FullName = FirstName + " " + LastName;
 
             if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BlazeGamesIM", "ChatLogs", NickName + ".xml")))
                 doc.Load(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BlazeGamesIM", "ChatLogs", NickName + ".xml"));
@@ -641,7 +692,7 @@ namespace BlazeGames.IM.Client
                 foreach (XmlNode xmlNode in xmlnodeList)
                 {
                     XmlElement element = (XmlElement)xmlNode;
-                    
+
                     string From = element.GetAttribute("From");
                     string To = element.GetAttribute("To");
                     bool Read = Convert.ToBoolean(element.GetAttribute("Read"));
@@ -657,7 +708,14 @@ namespace BlazeGames.IM.Client
                             this.LastMessage = Timestamp;
                         }
 
-                        Messages.Add(new Message(From, To, element.InnerText, Read, Timestamp));
+                        bool FromMe = false;
+                        if (From == App.NickName)
+                            FromMe = true;
+
+                        if(FromMe)
+                            Messages.Add(new Message(App.FullName, FullName, element.InnerText, Read, Timestamp));
+                        else
+                            Messages.Add(new Message(FullName, App.FullName, element.InnerText, Read, Timestamp));
                     }
                     
                 }
@@ -666,7 +724,10 @@ namespace BlazeGames.IM.Client
         private string _NickName,
             _StatusUpdate,
             _ProfileImage,
-            _BorderColor;
+            _BorderColor,
+            _FirstName,
+            _LastName,
+            _FullName;
 
         private int _NewMessages;
 
@@ -692,6 +753,18 @@ namespace BlazeGames.IM.Client
         /// </summary>
         public string NickName { get { return _NickName; } set { _NickName = value; OnPropertyChanged("NickName"); } }
         /// <summary>
+        /// Gets and sets the contacts nickname
+        /// </summary>
+        public string FirstName { get { return _FirstName; } set { _FirstName = value; OnPropertyChanged("FirstName"); } }
+        /// <summary>
+        /// Gets and sets the contacts nickname
+        /// </summary>
+        public string LastName { get { return _LastName; } set { _LastName = value; OnPropertyChanged("LastName"); } }
+        /// <summary>
+        /// Gets and sets the contacts nickname
+        /// </summary>
+        public string FullName { get { return _FullName; } set { _FullName = value; OnPropertyChanged("FullName"); } }
+        /// <summary>
         /// Gets and sets the pending state
         /// </summary>
         public bool Pending
@@ -716,7 +789,7 @@ namespace BlazeGames.IM.Client
                         control.btn_denyfriend.Visibility = System.Windows.Visibility.Collapsed;
                         control.btn_removefriend.Visibility = System.Windows.Visibility.Visible;
                         control.txt_Status.Text = StatusUpdate;
-                        control.txt_Status.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 255, 255));
+                        control.txt_Status.Foreground = MainWindow.Instance.Color2;
                     }
                 }
             }
@@ -736,7 +809,7 @@ namespace BlazeGames.IM.Client
         /// <summary>
         /// Gets and sets the contacts status
         /// </summary>
-        public Status status { get { return _status; } set { if (value == Status.Offline) { CallActive = false; } else { if (!CallActive) { VCallBtnVisibility = Visibility.Visible; VEndBtnVisibility = Visibility.Collapsed; } } _status = value; BorderColor = value.GetColor(); OnPropertyChanged("status"); } }
+        public Status status { get { return _status; } set { if (value == Status.Offline) { CallActive = false; VCallBtnVisibility = Visibility.Collapsed; VEndBtnVisibility = Visibility.Collapsed; } else { if (!CallActive) { VCallBtnVisibility = Visibility.Visible; VEndBtnVisibility = Visibility.Collapsed; } } _status = value; BorderColor = value.GetColor(); OnPropertyChanged("status"); } }
         /// <summary>
         /// Gets the contacts "status" border color
         /// </summary>
@@ -807,7 +880,7 @@ namespace BlazeGames.IM.Client
             MembersNode.AppendChild(NewMessageElement);
             doc.Save(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BlazeGamesIM", "ChatLogs", NickName + ".xml"));
 
-            Message msg = new Message(this.NickName, App.NickName, Message);
+            Message msg = new Message(this.FullName, App.FullName, Message);
             Messages.Add(msg);
 
             if (!App.Instance.OpenChats.Contains(this))
@@ -863,7 +936,7 @@ namespace BlazeGames.IM.Client
             doc.Save(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BlazeGamesIM", "ChatLogs", NickName + ".xml"));
 
             App.Instance.CSocket.SendPacket(BlazeGames.Networking.Packet.New(BlazeGames.IM.Client.Networking.Packets.PAK_CLI_SNDMSG, ID, Message));
-            Messages.Add(new Message(App.NickName, NickName, Message, true, DateTime.Now));
+            Messages.Add(new Message(App.FullName, NickName, Message, true, DateTime.Now));
         }
 
         public void MarkAllMessagesRead()

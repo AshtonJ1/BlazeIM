@@ -344,9 +344,9 @@ namespace BlazeGames.Networking
         /// <param name="Data">The string to write to the packet</param>
         public void Write(string Data)
         {
-            MemoryWriter.Write(Data.Length);
-            for (int i = 0; i < Data.Length; i++)
-                MemoryWriter.Write(Data[i]);
+            byte[] DataByte = Encoding.UTF8.GetBytes(Data);
+            MemoryWriter.Write(DataByte.Length);
+            MemoryWriter.Write(DataByte);
             UpdateChecksum();
         }
 
@@ -387,10 +387,7 @@ namespace BlazeGames.Networking
         {
             int Length = MemoryReader.ReadInt32();
             byte[] stringBytes = MemoryReader.ReadBytes(Length);
-            string Data = "";
-            for (int i = 0; i < Length; i++)
-                Data += (char)stringBytes[i];
-            return Data;
+            return Encoding.ASCII.GetString(stringBytes);
         }
 
         /// <summary>

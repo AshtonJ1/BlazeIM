@@ -6,14 +6,17 @@
              xmlns:local="clr-namespace:BlazeGames.IM.Client" x:Class="BlazeGames.IM.Client.page_chat" x:ClassModifier="internal"
              mc:Ignorable="d" 
              d:DesignHeight="492" d:DesignWidth="780">
+    <UserControl.Resources>
+        
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="85" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <RichTextBox xmlns:local="clr-namespace:BlazeGames.IM.Client" x:Name="rtf_output" HorizontalAlignment="Stretch" Margin="10,10,10,5" VerticalAlignment="Stretch" Background="#BFFFFFFF" BorderBrush="#BFFFFFFF" BorderThickness="5" TextChanged="rtf_output_TextChanged" IsReadOnly="True" IsDocumentEnabled="True" FontFamily="Segoe WP" MouseEnter="rtf_output_MouseEnter" MouseLeave="rtf_output_MouseLeave" >
+        <RichTextBox xmlns:local="clr-namespace:BlazeGames.IM.Client" x:Name="rtf_output" HorizontalAlignment="Stretch" Margin="10,10,10,5" VerticalAlignment="Stretch" Background="#85FFFFFF" BorderBrush="#85FFFFFF" BorderThickness="5" TextChanged="rtf_output_TextChanged" IsReadOnly="True" IsDocumentEnabled="True" FontFamily="Segoe WP" MouseEnter="rtf_output_MouseEnter" MouseLeave="rtf_output_MouseLeave" >
         </RichTextBox>
-        <RichTextBox AllowDrop="True" x:Name="rtf_input" HorizontalAlignment="Stretch" Margin="10,5,10,10" VerticalAlignment="Stretch" Background="#BFFFFFFF" BorderBrush="#BFFFFFFF" FontFamily="Segoe WP" Grid.Row="1" />
+        <RichTextBox AllowDrop="True" x:Name="rtf_input" Height="Auto" MinHeight="35" MaxHeight="175" HorizontalAlignment="Stretch" Margin="10,5,10,10" VerticalAlignment="Stretch" Background="#85FFFFFF" BorderBrush="#85FFFFFF" FontFamily="Segoe WP" Grid.Row="1" />
 
         <Border BorderBrush="#FF00AE20" BorderThickness="0,10,0,0" Height="80" HorizontalAlignment="Right" Margin="0,25,25,0" x:Name="profile_image" VerticalAlignment="Top" Width="70" MouseEnter="profile_image_MouseEnter" MouseLeave="profile_image_MouseLeave">
             <Border.Background>
